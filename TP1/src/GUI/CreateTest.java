@@ -5,11 +5,17 @@
  */
 package GUI;
 
+import Classes.Analysis;
+import Classes.Test;
 import Classes.User;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,12 +26,42 @@ import java.util.logging.Logger;
 public class CreateTest extends javax.swing.JPanel {
 
     User user;
+    ArrayList<Analysis> analises;
     /**
      * Creates new form CriarExame
      */
     public CreateTest(User user) {
         initComponents();
         this.user = user;
+        this.analises = new ArrayList<>();
+    }
+    
+    private User loadUser(String fileName) throws IOException{
+
+        try (FileInputStream fis = new FileInputStream(fileName);
+            ObjectInputStream ois = new ObjectInputStream(fis)) {
+            User user = (User) ois.readObject();
+            return user;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    private static void saveTest(Test test) throws IOException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+
+        String nameOfFile = test.getUser().getNumUtente() + "exame" + 
+                test.getDateTest().format(formatter) + ".test";
+        try (FileOutputStream fos = new FileOutputStream(nameOfFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(test);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
 
     /**
@@ -65,6 +101,11 @@ public class CreateTest extends javax.swing.JPanel {
         scrollShowEx.setViewportView(jTextArea1);
 
         jButton2.setText("Finalizar Exame");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Estado Atual Exame");
 
@@ -223,10 +264,10 @@ public class CreateTest extends javax.swing.JPanel {
         
         String numUtente = jTextField2.getText();
         String nomeUtente = jTextField3.getText();
-        byte[] userNumData;
         String tipo = txtTipoAn.getText();
         String nome = txtNameAn.getText();
         String resultado = txtResAn.getText();
+        Analysis analise = new Analysis(tipo, nome, resultado);
         
         //confirmar se o utilizador existe
             //-se existe, guardar conteudos dos ficheiros nas variáveis e 
@@ -237,7 +278,7 @@ public class CreateTest extends javax.swing.JPanel {
             
         try {
             //dados do ficheiro do nome do utente
-            userNumData = Files.readAllBytes(Paths.get(numUtente + ".utente"));
+            user = loadUser(numUtente + ".utente");
             
         } catch (IOException ex) {
             jLabel7.setText("Utente não existe!!");
@@ -261,12 +302,45 @@ public class CreateTest extends javax.swing.JPanel {
             //------ANÁLISE DE <TIPO_ANALISE> (<NOME_ANALISE>)------
                 //<RESULTADO>
             //-------------------------------------------------------
-        jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + "------\n");
-        jTextArea1.setText("\t" + resultado + "\n");
-        jTextArea1.setText("-----------------------------------\n");
+        jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + 
+                "(" + nome.toUpperCase() + ")------\n" + 
+                "\t" + resultado + "\n"
+                + LocalDateTime.now()
+                        + "-----------------------------------\n");
+        
+        //Adicionar análise a arrayList
+        analises.add(analise);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        //variáveis para o evento
+        String numUtente = jTextField2.getText();
+        String nomeUtente = jTextField3.getText();
+        String tipo = txtTipoAn.getText();
+        String nome = txtNameAn.getText();
+        String resultado = txtResAn.getText();
+        
+        //criar novo teste
+        Test test = new Test(LocalDateTime.now(), user, resultado, analises);
+        
+        //guardar novo teste
+        try {
+            saveTest(test);
+        } catch (IOException ex) {
+            Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //limpar todos os campos
+        jTextField2.setText("");
+        jTextField3.setText("");
+        txtNameAn.setText("");
+        txtTipoAn.setText("");
+        txtResAn.setText("");
+        jTextArea1.setText("");
+    }//GEN-LAST:event_jButton2ActionPerformed
 
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

@@ -4,28 +4,36 @@
  */
 package Classes;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
  *
  * @author AR
  */
-public class User {
+public class User implements Serializable{
     private final String nome;
-    private final Date dataNascimento;
+    private final LocalDateTime dataNascimento;
     private final String numUtente;
 
-    public User(String nome, Date dataNascimento, String numUtente) {
+    public User(String nome, LocalDateTime dataNascimento, String numUtente) {
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.numUtente = numUtente;
+    }
+    
+    public User(){
+        this.nome = "";
+        this.dataNascimento = LocalDateTime.now();
+        this.numUtente = "";
     }
 
     public String getNome() {
         return nome;
     }
 
-    public Date getDataNascimento() {
+    public LocalDateTime getDataNascimento() {
         return dataNascimento;
     }
 
