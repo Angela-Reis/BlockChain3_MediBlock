@@ -4,23 +4,26 @@
  */
 package Classes;
 
+import java.io.Serializable;
+
 /**
  *
  * @author AR
  */
-public class Analysis {
-    private final String tipeAnalysis;
+public class Analysis implements Serializable, Comparable<Analysis>{
+    private static final long serialVersionUID = 02L;
+    private final String typeAnalysis;
     private final String name;
     private final String result;
 
     public Analysis(String tipeAnalysis, String name, String result) {
-        this.tipeAnalysis = tipeAnalysis;
+        this.typeAnalysis = tipeAnalysis;
         this.name = name;
         this.result = result;
     }
 
-    public String getTipeAnalysis() {
-        return tipeAnalysis;
+    public String getTypeAnalysis() {
+        return typeAnalysis;
     }
 
     public String getName() {
@@ -29,6 +32,15 @@ public class Analysis {
 
     public String getResult() {
         return result;
+    }
+
+    public int compareTo(Analysis o) {
+        return typeAnalysis.compareTo(o.getTypeAnalysis());
+    }
+
+    @Override
+    public String toString() {
+        return typeAnalysis + " - " + name + " - " + result; 
     }
 
 }
