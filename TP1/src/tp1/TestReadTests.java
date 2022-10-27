@@ -5,6 +5,8 @@
  */
 package tp1;
 
+import GUI.ReadTests;
+
 
 /**
  *
@@ -16,6 +18,8 @@ public class TestReadTests extends javax.swing.JFrame {
      * Creates new form TestShowGUI
      */
     public TestReadTests() {
+        ReadTests read = new ReadTests(this);
+        add(read);
         initComponents();
 
     }

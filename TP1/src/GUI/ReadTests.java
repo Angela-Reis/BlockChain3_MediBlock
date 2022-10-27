@@ -10,27 +10,20 @@ import Classes.Test;
 import Classes.User;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -59,7 +52,7 @@ public class ReadTests extends javax.swing.JPanel {
         frame = f;
         initComponents();
         user = new User("Joao Teste", LocalDate.of(1990, 10, 20), "992133");
-        lblUtente.setText(lblUtente.getText() + " " + user.getNumUtente() + " " + user.getNome());
+        lblUtente.setText(lblUtente.getText() + " " + user.getNome() + " Nº" + user.getNumUtente());
         //get all Test of the user
         ArrayList<File> userExams = searchForTestUser(user);
 
@@ -99,17 +92,13 @@ public class ReadTests extends javax.swing.JPanel {
                 panelTestUser.add(new JLabel(String.valueOf(test.getAnalyses().size())), c);
                 c.gridx = 3;
                 JButton readTest = new JButton("Ver Exame");
-                readTest.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        readTestBtn(test);
-                    }
-                    
+                readTest.addActionListener((ActionEvent e) -> {
+                    readTestBtn(test);
                 });
                 panelTestUser.add(readTest, c);
             }
         }
         f.revalidate();
-        setVisible(true);
     }
     
     private Test loadTest(File fileTest) {
@@ -118,8 +107,8 @@ public class ReadTests extends javax.swing.JPanel {
                 ObjectInputStream ois = new ObjectInputStream(fis)) {
             Test test = (Test) ois.readObject();
             return test;
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        }  catch (IOException ex) {
+            Logger.getLogger(ReadTests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ReadTests.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -132,8 +121,7 @@ public class ReadTests extends javax.swing.JPanel {
         ArrayList<File> userFiles = new ArrayList<>();
         for (File f : files) {
             String fileName = f.getName();
-            if (fileName.startsWith(user.getNumUtente()) && fileName.endsWith(".test")) {
-                System.out.println(f.getName());
+            if (fileName.startsWith(user.getNumUtente()+"_exam") && fileName.endsWith(".test")) {
                 userFiles.add(f);
             }
         }
@@ -143,8 +131,10 @@ public class ReadTests extends javax.swing.JPanel {
     private void readTestBtn(Test test) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         String texto = "Nome: " + test.getUser().getNome();
+        Period p = Period.between(test.getUser().getDataNascimento(), LocalDate.now());
+        texto = texto + "\nIdade: " + p.getYears();
         texto = texto + "\nNº Utente: " + test.getUser().getNumUtente();
-        texto = texto + "\nData: " + test.getDateTest().format(formatter);
+        texto = texto + "\nData do Exame: " + test.getDateTest().format(formatter);
         texto = texto + "\nProfisional: " + test.getProfessional();
         texto = texto + "\n\nNome analise\t -\t Resultado";
         
@@ -169,10 +159,7 @@ public class ReadTests extends javax.swing.JPanel {
         area.setWrapStyleWord(true);
         
         panel.add(scroll);
-        scroll.getHorizontalScrollBar().setValue(0);
-        JOptionPane jop = new JOptionPane();
-        jop.setPreferredSize(new Dimension(480, jop.getPreferredSize().height));
-        jop.showMessageDialog(frame, panel, "Exame de " + test.getUser().getNumUtente(), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(frame, panel, "Exame de " + test.getUser().getNumUtente(), JOptionPane.INFORMATION_MESSAGE);
         
     }
 
