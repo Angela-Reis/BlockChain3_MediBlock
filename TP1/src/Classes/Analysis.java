@@ -4,11 +4,13 @@
  */
 package Classes;
 
+import java.io.Serializable;
+
 /**
  *
  * @author AR
  */
-public class Analysis {
+public class Analysis implements Serializable{
     private final String tipeAnalysis;
     private final String name;
     private final String result;

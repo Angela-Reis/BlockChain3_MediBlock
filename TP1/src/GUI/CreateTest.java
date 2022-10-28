@@ -92,6 +92,9 @@ public class CreateTest extends javax.swing.JPanel {
         jTextField3 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
 
+        setMinimumSize(new java.awt.Dimension(780, 400));
+        setPreferredSize(new java.awt.Dimension(780, 400));
+
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         scrollShowEx.setBackground(new java.awt.Color(255, 255, 255));
@@ -113,13 +116,13 @@ public class CreateTest extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(44, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jButton2))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -127,7 +130,7 @@ public class CreateTest extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollShowEx)
+                .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
                 .addContainerGap())
@@ -212,9 +215,9 @@ public class CreateTest extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -225,12 +228,10 @@ public class CreateTest extends javax.swing.JPanel {
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                     .addComponent(jLabel5)
                                     .addGap(18, 18, 18)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(18, 18, 18))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(148, 148, 148)))
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(jLabel7))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -246,11 +247,11 @@ public class CreateTest extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel6)
                             .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27))
+                        .addContainerGap())
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -261,7 +262,6 @@ public class CreateTest extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         //variáveis para a execução deste evento
-        
         String numUtente = jTextField2.getText();
         String nomeUtente = jTextField3.getText();
         String tipo = txtTipoAn.getText();
@@ -281,35 +281,48 @@ public class CreateTest extends javax.swing.JPanel {
             user = loadUser(numUtente + ".utente");
             
         } catch (IOException ex) {
-            jLabel7.setText("Utente não existe!!");
+            jLabel7.setText("Utente não existe!!".toUpperCase());
             jLabel7.setVisible(true);
             Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
+            
         //verificação de campos vazios  
-        
         if(jTextField2.getText().isBlank() ||
            jTextField3.getText().isBlank() ||
            txtNameAn.getText().isBlank() ||
            txtResAn.getText().isBlank() ||
            txtTipoAn.getText().isBlank()){
             
-            jLabel7.setText("Todos os campos são obrigatórios!");
+            jLabel7.setText("Todos os campos são obrigatórios!".toUpperCase());
             jLabel7.setVisible(true);
             
-        }
-            
-        //Inserir análise em texto no seguinte formato:
-            //------ANÁLISE DE <TIPO_ANALISE> (<NOME_ANALISE>)------
-                //<RESULTADO>
-            //-------------------------------------------------------
-        jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + 
-                "(" + nome.toUpperCase() + ")------\n" + 
-                "\t" + resultado + "\n"
-                + LocalDateTime.now()
-                        + "-----------------------------------\n");
-        
-        //Adicionar análise a arrayList
-        analises.add(analise);
+        }else{
+            if ((jLabel7.getText().isBlank() || jLabel7.getText().matches("LABEL DE AVISO"))
+                    && jTextField3.getText().matches(user.getNome())){
+                //Inserir análise em texto no seguinte formato:
+                //------ANÁLISE DE <TIPO_ANALISE> (<NOME_ANALISE>)------
+                    //<RESULTADO>
+                //-------------------------------------------------------
+                jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + 
+                        "(" + nome.toUpperCase() + ")------\n" +
+                        "DATA: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/YY")) + "\n" + 
+                        "RESULTADO: " + resultado + "\n"
+                                + "---------------------------------------------------\n");
+
+                //Adicionar análise a arrayList
+                analises.add(analise);
+                
+                //limpar campos de parametros de exame
+                txtNameAn.setText("");
+                txtTipoAn.setText("");
+                txtResAn.setText("");
+            } else {
+                jLabel7.setText("Utente não existe!!".toUpperCase());
+                jLabel7.setVisible(true);
+                jTextField2.setText("");
+                jTextField3.setText("");
+            }    
+        }   
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
