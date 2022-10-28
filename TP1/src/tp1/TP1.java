@@ -8,21 +8,18 @@ package tp1;
 import Classes.Analysis;
 import Classes.Test;
 import Classes.User;
-import GUI.ReadTests;
-import java.io.File;
-import java.io.FileInputStream;
+import GUI.CreateTest;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 /**
  *
@@ -33,12 +30,41 @@ public class TP1 {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        //testSaving();
+    
+    private static void saveUser(User user) throws IOException {
+
+        String nameOfFile = user.getNumUtente() + ".utente";
+        try (FileOutputStream fos = new FileOutputStream(nameOfFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(user);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
-
-
+    
+    public static void main(String[] args) {
+        //==================SÓ PARA TESTE================== :):):)
+        JFrame crtTestWin = new JFrame();
+        crtTestWin.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        User user = new User("Jota", LocalDate.now(), "23445");
+        CreateTest crtTestGUI = new CreateTest(user);
+        crtTestWin.setSize(crtTestGUI.getMinimumSize().width, crtTestGUI.getMinimumSize().height);
+        crtTestGUI.setVisible(true);
+        crtTestWin.add(crtTestGUI);
+        crtTestWin.setVisible(true);
+        
+        testSaving();
+        /*User testUser = new User("Jota", LocalDateTime.now(), "23445");
+        try {
+            saveUser(testUser);
+        } catch (IOException ex) {
+            Logger.getLogger(TP1.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+    }
+    
+    
     private static void testSaving() {
         ArrayList<Analysis> analyses = new ArrayList<>() {
             {
@@ -91,19 +117,5 @@ public class TP1 {
             ex.printStackTrace();
         }
 
-    }
-
-    private User loadUser(String fileName) {
-
-        try (FileInputStream fis = new FileInputStream(fileName);
-                ObjectInputStream ois = new ObjectInputStream(fis)) {
-            User user = (User) ois.readObject();
-            return user;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ReadTests.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
     }
 }
