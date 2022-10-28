@@ -4,6 +4,8 @@
  */
 package Classes;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -11,20 +13,21 @@ import java.util.Date;
  *
  * @author AR
  */
-public class Test {
-    private Date dateTest;
+public class Test implements Serializable {
+    private static final long serialVersionUID = 02L;
+    private LocalDateTime dateTest;
     private User user;
     private String professional;
     private ArrayList<Analysis> analyses;
 
-    public Test(Date dateTest, User user, String professional, ArrayList<Analysis> analyses) {
+    public Test(LocalDateTime dateTest, User user, String professional, ArrayList<Analysis> analyses) {
         this.dateTest = dateTest;
         this.user = user;
         this.professional = professional;
         this.analyses = analyses;
     }
 
-    public Date getDateTest() {
+    public LocalDateTime getDateTest() {
         return dateTest;
     }
 
