@@ -55,8 +55,8 @@ public class TP1 {
         crtTestWin.add(crtTestGUI);
         crtTestWin.setVisible(true);
         
-        testSaving();
-        /*User testUser = new User("Jota", LocalDateTime.now(), "23445");
+        //testSaving();
+        /*User testUser = new User("Jota", LocalDate.now(), "23445");
         try {
             saveUser(testUser);
         } catch (IOException ex) {

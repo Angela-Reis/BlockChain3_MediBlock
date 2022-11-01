@@ -53,7 +53,7 @@ public class CreateTest extends javax.swing.JPanel {
     private static void saveTest(Test test) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
 
-        String nameOfFile = test.getUser().getNumUtente() + "exame" + 
+        String nameOfFile = test.getUser().getNumUtente() + "_exame_" + 
                 test.getDateTest().format(formatter) + ".test";
         try (FileOutputStream fos = new FileOutputStream(nameOfFile);
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -86,6 +86,8 @@ public class CreateTest extends javax.swing.JPanel {
         txtTipoAn = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         txtResAn = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        prof = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
@@ -149,6 +151,14 @@ public class CreateTest extends javax.swing.JPanel {
             }
         });
 
+        jLabel8.setText("Profissional:");
+
+        prof.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -167,9 +177,13 @@ public class CreateTest extends javax.swing.JPanel {
                                 .addGap(29, 29, 29)
                                 .addComponent(txtNameAn))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel8))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtResAn))))
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtResAn)
+                                    .addComponent(prof)))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(167, 167, 167)
                         .addComponent(jButton1)))
@@ -190,7 +204,11 @@ public class CreateTest extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtResAn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(68, 68, 68)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(prof, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
+                .addGap(42, 42, 42)
                 .addComponent(jButton1)
                 .addContainerGap(19, Short.MAX_VALUE))
         );
@@ -291,7 +309,8 @@ public class CreateTest extends javax.swing.JPanel {
            jTextField3.getText().isBlank() ||
            txtNameAn.getText().isBlank() ||
            txtResAn.getText().isBlank() ||
-           txtTipoAn.getText().isBlank()){
+           txtTipoAn.getText().isBlank() ||
+           prof.getText().isBlank()){
             
             jLabel7.setText("Todos os campos são obrigatórios!".toUpperCase());
             jLabel7.setVisible(true);
@@ -305,7 +324,6 @@ public class CreateTest extends javax.swing.JPanel {
                 //-------------------------------------------------------
                 jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + 
                         "(" + nome.toUpperCase() + ")------\n" +
-                        "DATA: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/YY")) + "\n" + 
                         "RESULTADO: " + resultado + "\n"
                                 + "---------------------------------------------------\n");
 
@@ -316,6 +334,7 @@ public class CreateTest extends javax.swing.JPanel {
                 txtNameAn.setText("");
                 txtTipoAn.setText("");
                 txtResAn.setText("");
+                prof.setText("");
             } else {
                 jLabel7.setText("Utente não existe!!".toUpperCase());
                 jLabel7.setVisible(true);
@@ -326,15 +345,9 @@ public class CreateTest extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        //variáveis para o evento
-        String numUtente = jTextField2.getText();
-        String nomeUtente = jTextField3.getText();
-        String tipo = txtTipoAn.getText();
-        String nome = txtNameAn.getText();
-        String resultado = txtResAn.getText();
-        
+
         //criar novo teste
-        Test test = new Test(LocalDateTime.now(), user, resultado, analises);
+        Test test = new Test(LocalDateTime.now(), user, prof.getText(), analises);
         
         //guardar novo teste
         try {
@@ -349,8 +362,13 @@ public class CreateTest extends javax.swing.JPanel {
         txtNameAn.setText("");
         txtTipoAn.setText("");
         txtResAn.setText("");
+        prof.setText("");
         jTextArea1.setText("");
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void profActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_profActionPerformed
 
     
     
@@ -364,11 +382,13 @@ public class CreateTest extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField prof;
     private javax.swing.JScrollPane scrollShowEx;
     private javax.swing.JTextField txtNameAn;
     private javax.swing.JTextField txtResAn;
