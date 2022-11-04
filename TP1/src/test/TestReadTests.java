@@ -3,10 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tp1;
+package test;
 
-import GUI.ReadTests;
-
+import core.User;
+import gui.ReadExam;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,8 +22,13 @@ public class TestReadTests extends javax.swing.JFrame {
      * Creates new form TestShowGUI
      */
     public TestReadTests() {
-        ReadTests read = new ReadTests(this);
-        add(read);
+        /*try {
+            User user = new User("Joao", LocalDate.now(), "1111");
+            ReadExam read = new ReadExam(this, user);
+            add(read);
+        } catch (IOException ex) {
+            Logger.getLogger(TestReadTests.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
         initComponents();
 
     }

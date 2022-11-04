@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package GUI;
+package gui;
 
-import Classes.Analysis;
-import Classes.Test;
-import Classes.User;
+import core.Analysis;
+import core.Exam;
+import core.MedicalHistory;
+import core.User;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -20,10 +21,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -38,129 +41,49 @@ import javax.swing.JTextArea;
  *
  * @author AR
  */
-public class ReadTests extends javax.swing.JPanel {
-    
+public class ReadExam extends javax.swing.JPanel {
+
     User user;
     JFrame frame;
+    MedicalHistory history;
+
+    public void UpdateExams(User user) {
+        this.user = user;
+        loadPage();
+    }
 
     /**
      * Creates new form VerExame
      *
      * @param f
+     * @param history
+     * @param user
      */
-    public ReadTests(JFrame f) {
+    public ReadExam(User user, MedicalHistory history, JFrame f) {
+
+        this.user = user;
+        this.history = history;
         frame = f;
         initComponents();
-        user = new User("Joao Teste", LocalDate.of(1990, 10, 20), "992133");
-        lblUtente.setText(lblUtente.getText() + " " + user.getNome() + " Nº" + user.getNumUtente());
-        //get all Test of the user
-        ArrayList<File> userExams = searchForTestUser(user);
 
-        //sort Test by date from newest to oldest
-        userExams.sort((File o1, File o2) -> {
-            //Name of file is in format numUtente_exame_ano_mes_dia_hora_minutos.test, remove .test
-            String[] split1 = o1.getName().replace(".test", "").split("_");
-            String[] split2 = o2.getName().replace(".test", "").split("_");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm");
-            //Create String to turn into date
-            String date1 = split1[2] + "_" + split1[3] + "_" + split1[4] + "_" + split1[5] + "_" + split1[6];
-            String date2 = split2[2] + "_" + split2[3] + "_" + split2[4] + "_" + split2[5] + "_" + split2[6];
-            LocalDateTime dateTime1 = LocalDateTime.parse(date1, formatter);
-            LocalDateTime dateTime2 = LocalDateTime.parse(date2, formatter);
-            return dateTime2.compareTo(dateTime1);
-        });
-        GridBagConstraints c = new GridBagConstraints();
-        int i = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        for (File exam : userExams) {
-            Test test = loadTest(exam);
-            if (test == null) {
-                System.out.println("Error no Test Loaded");
-            } else {
-                i++;
-                String text = test.getDateTest().format(formatter) + " " + test.getProfessional();
-                c.gridy = i;
-                c.ipadx = 10;
-                c.weightx = 1;
-                c.weighty = 1;
-                c.anchor = GridBagConstraints.FIRST_LINE_START;
-                c.gridx = 0;
-                panelTestUser.add(new JLabel(test.getDateTest().format(formatter)), c);
-                c.gridx = 1;
-                panelTestUser.add(new JLabel(test.getProfessional()), c);
-                c.gridx = 2;
-                panelTestUser.add(new JLabel(String.valueOf(test.getAnalyses().size())), c);
-                c.gridx = 3;
-                JButton readTest = new JButton("Ver Exame");
-                readTest.addActionListener((ActionEvent e) -> {
-                    readTestBtn(test);
-                });
-                panelTestUser.add(readTest, c);
-            }
-        }
-        f.revalidate();
-    }
-    
-    private Test loadTest(File fileTest) {
-        //load test from file 
-        try (FileInputStream fis = new FileInputStream(fileTest.getName());
-                ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Test test = (Test) ois.readObject();
-            return test;
-        }  catch (IOException ex) {
-            Logger.getLogger(ReadTests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ReadTests.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        loadPage();
+
+
     }
 
-    //search for test of the user 
-    private ArrayList<File> searchForTestUser(User user) {
-        File[] files = new File(".").listFiles();
-        ArrayList<File> userFiles = new ArrayList<>();
-        for (File f : files) {
-            String fileName = f.getName();
-            if (fileName.startsWith(user.getNumUtente()+"_exam") && fileName.endsWith(".test")) {
-                userFiles.add(f);
-            }
-        }
-        return userFiles;
-    }
-    
-    private void readTestBtn(Test test) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        String texto = "Nome: " + test.getUser().getNome();
-        Period p = Period.between(test.getUser().getDataNascimento(), LocalDate.now());
-        texto = texto + "\nIdade: " + p.getYears();
-        texto = texto + "\nNº Utente: " + test.getUser().getNumUtente();
-        texto = texto + "\nData do Exame: " + test.getDateTest().format(formatter);
-        texto = texto + "\nProfisional: " + test.getProfessional();
-        texto = texto + "\n\nNome analise\t -\t Resultado";
-        
-        Collections.sort(test.getAnalyses());
-        String type = test.getAnalyses().get(0).getTypeAnalysis();
-        texto = texto + "\n\n\t" + type + "\n";
-        for (Analysis analysis : test.getAnalyses()) {
-            if (!type.equals(analysis.getTypeAnalysis())) {
-                type = analysis.getTypeAnalysis();
-                texto = texto + "\n\n\t" + type + "\n";
-            }
-            texto = texto + analysis.getName() + "\t-\t" + analysis.getResult() + "\n";
-        }
-        
+    private void readTestBtn(Exam test) {
         JPanel panel = new JPanel();
-        JTextArea area = new JTextArea(texto);
+        JTextArea area = new JTextArea(test.toString());
         panel.setLayout(new BorderLayout());
         area.setEditable(false);
         JScrollPane scroll = new JScrollPane(area);
         scroll.setPreferredSize(new Dimension(300, 300));
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
-        
+
         panel.add(scroll);
         JOptionPane.showMessageDialog(frame, panel, "Exame de " + test.getUser().getNumUtente(), JOptionPane.INFORMATION_MESSAGE);
-        
+
     }
 
     /**
@@ -228,7 +151,7 @@ public class ReadTests extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx)
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblUtente)
@@ -240,31 +163,116 @@ public class ReadTests extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(lblUtente)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollShowEx))
+                .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 322, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void addCabe() {
+        JLabel lblDate = new javax.swing.JLabel();
+        JLabel lblProf = new javax.swing.JLabel();
+        JLabel lblNumAn = new javax.swing.JLabel();
+        JLabel lblBtnRead = new javax.swing.JLabel();
+
+        lblDate.setText("Data");
+        GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.ipadx = 13;
+        gbc.ipady = 2;
+        gbc.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.7;
+        panelTestUser.add(lblDate, gbc);
+
+        lblProf.setText("Profesional");
+        gbc = new java.awt.GridBagConstraints();
+        gbc.ipadx = 18;
+        gbc.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gbc.weightx = 1.0;
+        panelTestUser.add(lblProf, gbc);
+
+        lblNumAn.setText("NºAnalises");
+        gbc = new java.awt.GridBagConstraints();
+        gbc.ipadx = 13;
+        gbc.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.4;
+        panelTestUser.add(lblNumAn, gbc);
+
+        lblBtnRead.setText("                ");
+        gbc = new java.awt.GridBagConstraints();
+        gbc.ipadx = 13;
+        gbc.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.4;
+        panelTestUser.add(lblBtnRead, gbc);
+    }
+
+    private void loadPage() {
+        panelTestUser.removeAll();
+        addCabe();
+        lblUtente.setText("Exames do Utente " + user.getName() + " Nº" + user.getNumUtente());
+        //get all Exam of the user
+        if(user==null){
+            return;
+        }
+        List<Exam> userExams = history.getHistoryUser(user);
+        //sort Exam by date from newest to oldest
+        userExams.sort((Exam o1, Exam o2) -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm");
+            //Create String to turn into date
+            String date1 = o1.getDateTest().format(formatter);
+            String date2 = o2.getDateTest().format(formatter);
+            LocalDateTime dateTime1 = LocalDateTime.parse(date1, formatter);
+            LocalDateTime dateTime2 = LocalDateTime.parse(date2, formatter);
+            return dateTime2.compareTo(dateTime1);
+        });
+
+        GridBagConstraints c = new GridBagConstraints();
+        int i = 0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        for (Exam exam : userExams) {
+            if (exam != null) {
+                i++;
+                String text = exam.getDateTest().format(formatter) + " " + exam.getProfessional();
+                c.gridy = i;
+                c.ipadx = 10;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.FIRST_LINE_START;
+                c.gridx = 0;
+                panelTestUser.add(new JLabel(exam.getDateTest().format(formatter)), c);
+                c.gridx = 1;
+                panelTestUser.add(new JLabel(exam.getProfessional()), c);
+                c.gridx = 2;
+                panelTestUser.add(new JLabel(String.valueOf(exam.getAnalyses().size())), c);
+                c.gridx = 3;
+                JButton readTest = new JButton("Ver Exame");
+                readTest.addActionListener((ActionEvent e) -> {
+                    readTestBtn(exam);
+                });
+                panelTestUser.add(readTest, c);
+            }
+        }
+        frame.revalidate();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

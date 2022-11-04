@@ -3,65 +3,57 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package GUI;
+package gui;
 
-import Classes.Analysis;
-import Classes.Test;
-import Classes.User;
-import java.io.FileInputStream;
+import core.Analysis;
+import core.Exam;
+import core.MedicalHistory;
+import core.User;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author AR
  */
-public class CreateTest extends javax.swing.JPanel {
+public class CreateExam extends javax.swing.JPanel {
 
     User user;
-    ArrayList<Analysis> analises;
+    ArrayList<Analysis> analyses;
+    MedicalHistory history;
+    String fileName;
+
     /**
      * Creates new form CriarExame
+     *
+     * @param user
+     * @param history
+     * @param fileName
      */
-    public CreateTest(User user) {
+    public CreateExam(User user, MedicalHistory history, String fileName) {
         initComponents();
         this.user = user;
-        this.analises = new ArrayList<>();
+        txtNameUser.setText(user.getName());
+        txtNumUser.setText(user.getNumUtente());
+        this.history = history;
+        this.analyses = new ArrayList<>();
+        this.fileName = fileName;
     }
-    
-    private User loadUser(String fileName) throws IOException{
 
-        try (FileInputStream fis = new FileInputStream(fileName);
-            ObjectInputStream ois = new ObjectInputStream(fis)) {
-            User user = (User) ois.readObject();
-            return user;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
-    private static void saveTest(Test test) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
-
-        String nameOfFile = test.getUser().getNumUtente() + "_exame_" + 
-                test.getDateTest().format(formatter) + ".test";
-        try (FileOutputStream fos = new FileOutputStream(nameOfFile);
-            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(test);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
+    public void UpdateUser(User user) {
+        this.user = user;
+        txtNameUser.setText(user.getName());
+        txtNumUser.setText(user.getNumUtente());
+        this.analyses = new ArrayList<>();
     }
 
     /**
@@ -76,7 +68,7 @@ public class CreateTest extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         scrollShowEx = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jButton2 = new javax.swing.JButton();
+        btnSaveExam = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -84,15 +76,15 @@ public class CreateTest extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtTipoAn = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnAddAnalysis = new javax.swing.JButton();
         txtResAn = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        prof = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
+        txtNumUser = new javax.swing.JTextField();
+        txtNameUser = new javax.swing.JTextField();
+        lblAviso = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        prof = new javax.swing.JTextField();
 
         setMinimumSize(new java.awt.Dimension(780, 400));
         setPreferredSize(new java.awt.Dimension(780, 400));
@@ -105,10 +97,10 @@ public class CreateTest extends javax.swing.JPanel {
         jTextArea1.setRows(5);
         scrollShowEx.setViewportView(jTextArea1);
 
-        jButton2.setText("Finalizar Exame");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnSaveExam.setText("Finalizar Exame");
+        btnSaveExam.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnSaveExamActionPerformed(evt);
             }
         });
 
@@ -118,12 +110,12 @@ public class CreateTest extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
-                    .addComponent(jButton2))
+                    .addComponent(btnSaveExam))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -134,7 +126,7 @@ public class CreateTest extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(btnSaveExam)
                 .addContainerGap())
         );
 
@@ -144,18 +136,10 @@ public class CreateTest extends javax.swing.JPanel {
 
         jLabel3.setText("Tipo Analise:");
 
-        jButton1.setText("Adicionar Analise");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnAddAnalysis.setText("Adicionar Analise");
+        btnAddAnalysis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setText("Profissional:");
-
-        prof.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                profActionPerformed(evt);
+                btnAddAnalysisActionPerformed(evt);
             }
         });
 
@@ -177,16 +161,12 @@ public class CreateTest extends javax.swing.JPanel {
                                 .addGap(29, 29, 29)
                                 .addComponent(txtNameAn))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel8))
+                                .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtResAn)
-                                    .addComponent(prof)))))
+                                .addComponent(txtResAn))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(167, 167, 167)
-                        .addComponent(jButton1)))
+                        .addComponent(btnAddAnalysis)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -204,12 +184,8 @@ public class CreateTest extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtResAn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(prof, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addGap(42, 42, 42)
-                .addComponent(jButton1)
+                .addGap(68, 68, 68)
+                .addComponent(btnAddAnalysis)
                 .addContainerGap(19, Short.MAX_VALUE))
         );
 
@@ -217,16 +193,27 @@ public class CreateTest extends javax.swing.JPanel {
 
         jLabel6.setText("Nome:");
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        txtNumUser.setEditable(false);
+        txtNumUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                txtNumUserActionPerformed(evt);
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Arial Black", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel7.setText("LABEL DE AVISO");
-        jLabel7.setVisible(false);
+        txtNameUser.setEditable(false);
+
+        lblAviso.setFont(new java.awt.Font("Arial Black", 1, 14)); // NOI18N
+        lblAviso.setForeground(new java.awt.Color(255, 0, 0));
+        lblAviso.setText("LABEL DE AVISO");
+        lblAviso.setVisible(false);
+
+        jLabel8.setText("Profissional:");
+
+        prof.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -235,21 +222,28 @@ public class CreateTest extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(150, 150, 150)
+                        .addComponent(lblAviso))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtNumUser, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel6)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(jLabel5)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addComponent(jLabel7))
+                                    .addComponent(jLabel8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(prof)
+                                    .addComponent(txtNameUser, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE))))))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -260,137 +254,128 @@ public class CreateTest extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtNumUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel6)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtNameUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(prof, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(11, 11, 11)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                        .addComponent(lblAviso, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void txtNumUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumUserActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_txtNumUserActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnAddAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAnalysisActionPerformed
         //variáveis para a execução deste evento
-        String numUtente = jTextField2.getText();
-        String nomeUtente = jTextField3.getText();
         String tipo = txtTipoAn.getText();
         String nome = txtNameAn.getText();
         String resultado = txtResAn.getText();
         Analysis analise = new Analysis(tipo, nome, resultado);
-        
+
         //confirmar se o utilizador existe
-            //-se existe, guardar conteudos dos ficheiros nas variáveis e 
-            //proceder para a análise a inserir
-            
-            //-se não, escrever 'Utente não existe!!' em label de aviso e
-            //torná-la visível
-            
-        try {
-            //dados do ficheiro do nome do utente
-            user = loadUser(numUtente + ".utente");
-            
-        } catch (IOException ex) {
-            jLabel7.setText("Utente não existe!!".toUpperCase());
-            jLabel7.setVisible(true);
-            Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            
+        //-se existe, guardar conteudos dos ficheiros nas variáveis e 
+        //proceder para a análise a inserir
+        //-se não, escrever 'Utente não existe!!' em label de aviso e
+        //torná-la visível
         //verificação de campos vazios  
-        if(jTextField2.getText().isBlank() ||
-           jTextField3.getText().isBlank() ||
-           txtNameAn.getText().isBlank() ||
-           txtResAn.getText().isBlank() ||
-           txtTipoAn.getText().isBlank() ||
-           prof.getText().isBlank()){
-            
-            jLabel7.setText("Todos os campos são obrigatórios!".toUpperCase());
-            jLabel7.setVisible(true);
-            
-        }else{
-            if ((jLabel7.getText().isBlank() || jLabel7.getText().matches("LABEL DE AVISO"))
-                    && jTextField3.getText().matches(user.getNome())){
+        if (txtNumUser.getText().isBlank()
+                || txtNameUser.getText().isBlank()
+                || txtNameAn.getText().isBlank()
+                || txtResAn.getText().isBlank()
+                || txtTipoAn.getText().isBlank()
+                || prof.getText().isBlank()) {
+
+            lblAviso.setText("Todos os campos são obrigatórios!".toUpperCase());
+            lblAviso.setVisible(true);
+
+        } else {
+            if ((lblAviso.getText().isBlank() || lblAviso.getText().matches("LABEL DE AVISO"))
+                    && txtNameUser.getText().matches(user.getName())) {
                 //Inserir análise em texto no seguinte formato:
                 //------ANÁLISE DE <TIPO_ANALISE> (<NOME_ANALISE>)------
-                    //<RESULTADO>
+                //<RESULTADO>
                 //-------------------------------------------------------
-                jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase() + 
-                        "(" + nome.toUpperCase() + ")------\n" +
-                        "RESULTADO: " + resultado + "\n"
-                                + "---------------------------------------------------\n");
+                jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase()
+                        + "(" + nome.toUpperCase() + ")------\n"
+                        + "RESULTADO: " + resultado + "\n"
+                        + "---------------------------------------------------\n");
 
                 //Adicionar análise a arrayList
-                analises.add(analise);
-                
+                analyses.add(analise);
+
                 //limpar campos de parametros de exame
                 txtNameAn.setText("");
                 txtTipoAn.setText("");
                 txtResAn.setText("");
-                prof.setText("");
             } else {
-                jLabel7.setText("Utente não existe!!".toUpperCase());
-                jLabel7.setVisible(true);
-                jTextField2.setText("");
-                jTextField3.setText("");
-            }    
-        }   
-    }//GEN-LAST:event_jButton1ActionPerformed
+                lblAviso.setText("Utente não existe!!".toUpperCase());
+                lblAviso.setVisible(true);
+                txtNumUser.setText("");
+                txtNameUser.setText("");
+            }
+        }
+    }//GEN-LAST:event_btnAddAnalysisActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnSaveExamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveExamActionPerformed
 
         //criar novo teste
-        Test test = new Test(LocalDateTime.now(), user, prof.getText(), analises);
-        
+        Exam test = new Exam(LocalDateTime.now(), user, prof.getText(), analyses);
+
         //guardar novo teste
         try {
-            saveTest(test);
+            if (!prof.getText().isBlank()) {
+                history.add(test);
+                history.save(fileName);
+            } else {
+                JOptionPane.showMessageDialog(null, "Add Profesional");
+            }
         } catch (IOException ex) {
-            Logger.getLogger(CreateTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreateExam.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(CreateExam.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        //limpar todos os campos
-        jTextField2.setText("");
-        jTextField3.setText("");
+
         txtNameAn.setText("");
         txtTipoAn.setText("");
         txtResAn.setText("");
         prof.setText("");
         jTextArea1.setText("");
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnSaveExamActionPerformed
 
     private void profActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_profActionPerformed
 
-    
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnAddAnalysis;
+    private javax.swing.JButton btnSaveExam;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JLabel lblAviso;
     private javax.swing.JTextField prof;
     private javax.swing.JScrollPane scrollShowEx;
     private javax.swing.JTextField txtNameAn;
+    private javax.swing.JTextField txtNameUser;
+    private javax.swing.JTextField txtNumUser;
     private javax.swing.JTextField txtResAn;
     private javax.swing.JTextField txtTipoAn;
     // End of variables declaration//GEN-END:variables
