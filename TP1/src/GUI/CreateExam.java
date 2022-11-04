@@ -9,6 +9,7 @@ import core.Analysis;
 import core.Exam;
 import core.MedicalHistory;
 import core.User;
+import core.Patient;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -27,7 +28,7 @@ import javax.swing.JOptionPane;
  */
 public class CreateExam extends javax.swing.JPanel {
 
-    User user;
+    Patient user;
     ArrayList<Analysis> analyses;
     MedicalHistory history;
     String fileName;
@@ -39,7 +40,7 @@ public class CreateExam extends javax.swing.JPanel {
      * @param history
      * @param fileName
      */
-    public CreateExam(User user, MedicalHistory history, String fileName) {
+    public CreateExam(Patient user, MedicalHistory history, String fileName) {
         initComponents();
         this.user = user;
         txtNameUser.setText(user.getName());
@@ -49,7 +50,7 @@ public class CreateExam extends javax.swing.JPanel {
         this.fileName = fileName;
     }
 
-    public void UpdateUser(User user) {
+    public void UpdateUser(Patient user) {
         this.user = user;
         txtNameUser.setText(user.getName());
         txtNumUser.setText(user.getNumUtente());
@@ -285,7 +286,7 @@ public class CreateExam extends javax.swing.JPanel {
         //confirmar se o utilizador existe
         //-se existe, guardar conteudos dos ficheiros nas variáveis e 
         //proceder para a análise a inserir
-        //-se não, escrever 'Utente não existe!!' em label de aviso e
+        //-se não, escrever 'Patient não existe!!' em label de aviso e
         //torná-la visível
         //verificação de campos vazios  
         if (txtNumUser.getText().isBlank()

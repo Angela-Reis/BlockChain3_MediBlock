@@ -23,11 +23,11 @@ public class Exam implements Serializable {
 
     private static final long serialVersionUID = 02L;
     private LocalDateTime dateTest;
-    private User user;
+    private Patient user;
     private String professional;
     private ArrayList<Analysis> analyses;
 
-    public Exam(LocalDateTime dateTest, User user, String professional, ArrayList<Analysis> analyses) {
+    public Exam(LocalDateTime dateTest, Patient user, String professional, ArrayList<Analysis> analyses) {
         this.dateTest = dateTest;
         this.user = user;
         this.professional = professional;
@@ -38,7 +38,7 @@ public class Exam implements Serializable {
         return dateTest;
     }
 
-    public User getUser() {
+    public Patient getUtente() {
         return user;
     }
 

@@ -6,6 +6,7 @@
 package gui;
 
 import core.User;
+import core.Patient;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +130,7 @@ public class CreateUser extends javax.swing.JPanel {
         LocalDate date = LocalDate.parse(txtFormatDate.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         try {
-            User user = new User(txtName.getText(), date, txtNumUt.getText());
+            Patient user = new Patient(txtName.getText(), date, txtNumUt.getText());
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(jPanel1, "There was an Error when creating User", "Error", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(CreateUser.class.getName()).log(Level.SEVERE, null, ex);

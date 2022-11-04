@@ -9,6 +9,7 @@ import core.Analysis;
 import core.Exam;
 import core.MedicalHistory;
 import core.User;
+import core.Patient;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -43,11 +44,11 @@ import javax.swing.JTextArea;
  */
 public class ReadExam extends javax.swing.JPanel {
 
-    User user;
+    Patient user;
     JFrame frame;
     MedicalHistory history;
 
-    public void UpdateExams(User user) {
+    public void UpdateExams(Patient user) {
         this.user = user;
         loadPage();
     }
@@ -59,7 +60,7 @@ public class ReadExam extends javax.swing.JPanel {
      * @param history
      * @param user
      */
-    public ReadExam(User user, MedicalHistory history, JFrame f) {
+    public ReadExam(Patient user, MedicalHistory history, JFrame f) {
 
         this.user = user;
         this.history = history;
@@ -80,9 +81,8 @@ public class ReadExam extends javax.swing.JPanel {
         scroll.setPreferredSize(new Dimension(300, 300));
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
-
         panel.add(scroll);
-        JOptionPane.showMessageDialog(frame, panel, "Exame de " + test.getUser().getNumUtente(), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(frame, panel, "Exame de " + test.getUtente().getNumUtente(), JOptionPane.INFORMATION_MESSAGE);
 
     }
 

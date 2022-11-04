@@ -52,7 +52,7 @@ public class MedicalHistory implements Serializable {
         List<Exam> hstUser = new ArrayList<>();
         for (Block b : history.getChain()) {
             Exam e = Exam.fromBase64(b.getData());
-            if (e.getUser().equals(user)) {
+            if (e.getUtente().equals(user)) {
                 hstUser.add(e);
             }
         }

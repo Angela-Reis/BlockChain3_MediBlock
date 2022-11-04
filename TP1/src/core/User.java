@@ -22,35 +22,20 @@ import java.util.List;
  *
  * @author AR
  */
-public class User implements Serializable {
+public abstract class User implements Serializable {
 
     private static final long serialVersionUID = 02L;
     public static String USER_PATH = "utente/";
 
-    private final String name;
-    private final LocalDate dateOfBirth;
-    private final String numUtente;
+    protected final String name;
+    protected final LocalDate dateOfBirth;
 
-    public User(String nome, LocalDate dataNascimento, String numUtente) throws IOException {
+    public User(String nome, LocalDate dataNascimento) throws IOException {
         this.name = nome;
         this.dateOfBirth = dataNascimento;
-        this.numUtente = numUtente;
-
-        saveUser();
-
     }
 
-    private void saveUser() throws IOException {
-        File file = new File(USER_PATH);
-        file.mkdirs();
-
-        String nameOfFile = USER_PATH + numUtente + ".user";
-        try (FileOutputStream fos = new FileOutputStream(nameOfFile);
-                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(this);
-        }
-
-    }
+    protected abstract void saveUser() throws IOException;
 
     public String getName() {
         return name;
@@ -58,10 +43,6 @@ public class User implements Serializable {
 
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
-    }
-
-    public String getNumUtente() {
-        return numUtente;
     }
 
     private static User load(String username) throws FileNotFoundException, IOException, ClassNotFoundException {
@@ -72,54 +53,6 @@ public class User implements Serializable {
             User user = (User) ois.readObject();
             return user;
         }
-    }
-
-    public static List<User> getUserList() {
-        List<User> lst = new ArrayList<>();
-        //Ler os ficheiros da path dos utilizadores
-        File[] files = new File(USER_PATH).listFiles();
-        if (files == null) {
-            return lst;
-        }
-        //contruir um user com cada ficheiros
-        for (File file : files) {
-            //se for uma chave publica
-            if (file.getName().endsWith(".user")) {
-                //nome do utilizador
-                String userName = file.getName().substring(0, file.getName().lastIndexOf("."));
-                try {
-                    lst.add(load(userName));
-                } catch (Exception e) {
-                    System.out.println("Could not load file of" + userName);
-                }
-            }
-        }
-        return lst;
-    }
-
-    @Override
-    public String toString() {
-        return numUtente + " - " + name;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || !(obj instanceof User)) {
-            return false;
-        }
-
-        User userCompare = (User) obj;
-        if (!userCompare.getNumUtente().equals(this.numUtente)) {
-            return false;
-        }
-        if (!userCompare.getName().equals(this.name)) {
-            return false;
-        }
-        return userCompare.getDateOfBirth().equals(this.dateOfBirth);
-
     }
 
 }

@@ -5,17 +5,9 @@
  */
 package gui;
 
-import core.Analysis;
-import core.Exam;
 import core.MedicalHistory;
-import core.User;
+import core.Patient;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -26,7 +18,7 @@ import javax.swing.JOptionPane;
 public class ExamHistory extends javax.swing.JFrame {
 
     public static String fileExamHistory = "ExamHistory.obj";
-    User u;
+    Patient u;
     MedicalHistory history;
     CreateExam tabCreate;
     ReadExam tabRead;
@@ -37,17 +29,19 @@ public class ExamHistory extends javax.swing.JFrame {
     public ExamHistory() {
         initComponents();
         listUsers.setSelectedIndex(0);
-        u = (User) listUsers.getSelectedValuesList().get(0);
+        //u = (Patient) listUsers.getSelectedValuesList().get(0);
 
         history = new MedicalHistory();
         try {
             history = MedicalHistory.load(fileExamHistory);
         } catch (IOException | ClassNotFoundException ex) {
         }
-        tabCreate = new CreateExam(u, history, fileExamHistory);
-        tabRead = new ReadExam(u, history, this);
-        tabPane.add("Create", tabCreate);
-        tabPane.add("Read", tabRead);
+        if (listUsers.getSelectedIndex() >= 0) {
+            tabCreate = new CreateExam(u, history, fileExamHistory);
+            tabRead = new ReadExam(u, history, this);
+            tabPane.add("Create", tabCreate);
+            tabPane.add("Read", tabRead);
+        }
     }
 
     /**
@@ -113,11 +107,10 @@ public class ExamHistory extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (tabPane.getSelectedComponent() == scrlUsers) {
             DefaultListModel model = new DefaultListModel();
-            model.addAll(User.getUserList());
+            model.addAll(Patient.getUtenteList());
             listUsers.setModel(model);
         }
         if (tabPane.getSelectedComponent() == tabRead) {
-
             tabRead.UpdateExams(u);
         }
         if (tabPane.getSelectedComponent() == tabCreate) {
@@ -128,11 +121,10 @@ public class ExamHistory extends javax.swing.JFrame {
     private void listUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listUsersValueChanged
         // TODO add your handling code here:
         if (listUsers.getSelectedIndex() >= 0) {
-            u = (User) listUsers.getSelectedValuesList().get(0);
+            u = (Patient) listUsers.getSelectedValuesList().get(0);
         }
-        
-                if (tabRead!=null) {
 
+        if (tabRead != null) {
             tabRead.UpdateExams(u);
         }
     }//GEN-LAST:event_listUsersValueChanged
