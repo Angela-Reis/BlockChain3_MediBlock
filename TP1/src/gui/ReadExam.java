@@ -39,7 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
- *
+ * Class for panel to read exams from memory
  * @author AR
  */
 public class ReadExam extends javax.swing.JPanel {
@@ -50,7 +50,7 @@ public class ReadExam extends javax.swing.JPanel {
 
     public void UpdateExams(Patient user) {
         this.user = user;
-        loadPage();
+        listUserExams();
     }
 
     /**
@@ -67,11 +67,16 @@ public class ReadExam extends javax.swing.JPanel {
         frame = f;
         initComponents();
 
-        loadPage();
+        listUserExams();
 
 
     }
 
+    /**
+     * Action that shows an optionPane when the button read test is pressed.
+     * 
+     * @param test 
+     */
     private void readTestBtn(Exam test) {
         JPanel panel = new JPanel();
         JTextArea area = new JTextArea(test.toString());
@@ -184,7 +189,10 @@ public class ReadExam extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void addCabe() {
+    /**
+     * Adds the exam list header
+     */
+    private void addHeader() {
         JLabel lblDate = new javax.swing.JLabel();
         JLabel lblProf = new javax.swing.JLabel();
         JLabel lblNumAn = new javax.swing.JLabel();
@@ -225,9 +233,12 @@ public class ReadExam extends javax.swing.JPanel {
         panelTestUser.add(lblBtnRead, gbc);
     }
 
-    private void loadPage() {
+    /**
+     * Loads the page and lists all the exams of an user
+     */
+    private void listUserExams() {
         panelTestUser.removeAll();
-        addCabe();
+        addHeader();
         lblUtente.setText("Exames do Utente " + user.getName() + " Nº" + user.getNumUtente());
         //get all Exam of the user
         if(user==null){
