@@ -44,9 +44,9 @@ import javax.swing.JTextArea;
  */
 public class ReadExam extends javax.swing.JPanel {
 
-    Patient user;
-    JFrame frame;
-    MedicalHistory history;
+    Patient user; // the patient
+    JFrame frame; // the window
+    MedicalHistory history; // the blochchain
 
     public void UpdateExams(Patient user) {
         this.user = user;

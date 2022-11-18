@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Class for panel to create users into th database
  * @author AR
  */
 public class CreateUser extends javax.swing.JPanel {

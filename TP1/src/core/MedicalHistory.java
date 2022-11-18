@@ -18,15 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Class to create the medical history over a blockchain
+ * 
  * @author AR
  */
 public class MedicalHistory implements Serializable {
 
-    private static final long serialVersionUID = 02L;
-    public static int DIFICULTY = 1;
+    private static final long serialVersionUID = 02L; // serialization version
+    public static int DIFICULTY = 1; // mining dificulty
 
-    private final BlockChain history;
+    private final BlockChain history; // the blockchain itself
 
     public MedicalHistory() {
         history = new BlockChain();
@@ -48,6 +49,12 @@ public class MedicalHistory implements Serializable {
         return hst;
     }
 
+    /**
+     * Get user-filtered history
+     * 
+     * @param user
+     * @return 
+     */
     public List<Exam> getHistoryUser(User user) {
         List<Exam> hstUser = new ArrayList<>();
         for (Block b : history.getChain()) {
@@ -59,10 +66,22 @@ public class MedicalHistory implements Serializable {
         return hstUser;
     }
 
+    /**
+     * Method to add a block to the blockchain
+     * 
+     * @param e
+     * @throws Exception 
+     */
     public void add(Exam e) throws Exception {
         history.add(e.toBase64(), DIFICULTY);
     }
-
+    
+    /**
+     * Method to save the blockchain as an object
+     * 
+     * @param fileName
+     * @throws IOException 
+     */
     public void save(String fileName) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(
                 new FileOutputStream(fileName))) {
@@ -70,6 +89,14 @@ public class MedicalHistory implements Serializable {
         }
     }
 
+    /**
+     * Load the object representing the blockchain from memory
+     * 
+     * @param fileName
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     public static MedicalHistory load(String fileName) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(
                 new FileInputStream(fileName))) {
