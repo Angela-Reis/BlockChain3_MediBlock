@@ -44,6 +44,8 @@ public class CreateUser extends javax.swing.JPanel {
         txtNumUt = new javax.swing.JTextField();
         btnAddUser = new javax.swing.JButton();
         txtFormatDate = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        comboSex = new javax.swing.JComboBox<>();
 
         jLabel1.setText("Nome:");
 
@@ -61,24 +63,31 @@ public class CreateUser extends javax.swing.JPanel {
         txtFormatDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter()));
         txtFormatDate.setToolTipText("30/12/1998");
 
+        jLabel4.setText("Sexo:");
+
+        comboSex.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "F", "M" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel3)
+                        .addComponent(jLabel2)
+                        .addComponent(jLabel1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtName)
                     .addComponent(txtNumUt, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                    .addComponent(txtFormatDate)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnAddUser)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txtFormatDate))
+                    .addComponent(comboSex, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -97,8 +106,12 @@ public class CreateUser extends javax.swing.JPanel {
                     .addComponent(jLabel3)
                     .addComponent(txtNumUt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(comboSex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addComponent(btnAddUser)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         txtFormatDate.getAccessibleContext().setAccessibleName("");
@@ -129,20 +142,18 @@ public class CreateUser extends javax.swing.JPanel {
         }
         LocalDate date = LocalDate.parse(txtFormatDate.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        try {
-            Patient user = new Patient(txtName.getText(), date, txtNumUt.getText());
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(jPanel1, "There was an Error when creating User", "Error", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(CreateUser.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Patient user = new Patient(txtName.getText(), date, txtNumUt.getText(), comboSex.getSelectedItem().toString().charAt(0));
+
     }//GEN-LAST:event_btnAddUserActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddUser;
+    private javax.swing.JComboBox<String> comboSex;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JFormattedTextField txtFormatDate;
     private javax.swing.JTextField txtName;

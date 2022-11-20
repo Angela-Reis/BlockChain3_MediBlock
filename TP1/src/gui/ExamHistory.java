@@ -107,7 +107,7 @@ public class ExamHistory extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (tabPane.getSelectedComponent() == scrlUsers) {
             DefaultListModel model = new DefaultListModel();
-            model.addAll(Patient.getUtenteList());
+            model.addAll(Patient.getPatientList());
             listUsers.setModel(model);
         }
         if (tabPane.getSelectedComponent() == tabRead) {

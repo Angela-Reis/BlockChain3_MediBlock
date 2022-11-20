@@ -7,13 +7,11 @@ package core;
 
 import blockchain.Block;
 import blockchain.BlockChain;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import java.util.List;
  *
  * @author AR
  */
-public class MedicalHistory implements Serializable {
+public class MedicalHistory {
 
     private static final long serialVersionUID = 02L;
     public static int DIFICULTY = 1;
@@ -38,6 +36,7 @@ public class MedicalHistory implements Serializable {
 
     /**
      * Get exam history
+     * @return 
      */
     public List<Exam> getHistory() {
         List<Exam> hst = new ArrayList<>();
