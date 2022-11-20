@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Class for panel to create exams
  * @author AR
  */
 public class CreateExam extends javax.swing.JPanel {
@@ -49,7 +49,12 @@ public class CreateExam extends javax.swing.JPanel {
         this.analyses = new ArrayList<>();
         this.fileName = fileName;
     }
-
+    
+    /**
+     * Updates the user
+     * 
+     * @param user 
+     */
     public void UpdateUser(Patient user) {
         this.user = user;
         txtNameUser.setText(user.getName());
@@ -276,6 +281,11 @@ public class CreateExam extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNumUserActionPerformed
 
+    /**
+     * Actions to preform when the button to add analysis is pressed
+     * 
+     * @param evt 
+     */
     private void btnAddAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAnalysisActionPerformed
         //variáveis para a execução deste evento
         String tipo = txtTipoAn.getText();
@@ -327,6 +337,11 @@ public class CreateExam extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnAddAnalysisActionPerformed
 
+    /**
+     * Actions to preform when the button to add save an exam is pressed
+     * 
+     * @param evt 
+     */
     private void btnSaveExamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveExamActionPerformed
 
         //criar novo teste

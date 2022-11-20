@@ -16,16 +16,17 @@ import java.util.Date;
 import utils.Serializer;
 
 /**
- *
+ * Class that represents the Exam
+ * 
  * @author AR
  */
 public class Exam implements Serializable {
 
-    private static final long serialVersionUID = 02L;
-    private LocalDateTime dateTest;
-    private Patient user;
-    private String professional;
-    private ArrayList<Analysis> analyses;
+    private static final long serialVersionUID = 02L; // serialization version
+    private LocalDateTime dateTest; // date of test
+    private Patient user; // user whom the exam is preformed on
+    private String professional; // professional that preforms the exam
+    private ArrayList<Analysis> analyses; // Analysis of exam
 
     public Exam(LocalDateTime dateTest, Patient user, String professional, ArrayList<Analysis> analyses) {
         this.dateTest = dateTest;
@@ -72,6 +73,11 @@ public class Exam implements Serializable {
         return (Exam) Serializer.bytesToObject(data);
     }
 
+    /**
+     * Convert the exam to string with format 'analysis.getName() + "\t-\t"+ analysis.getResult() + "\n"'
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
