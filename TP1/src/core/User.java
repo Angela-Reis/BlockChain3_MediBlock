@@ -62,6 +62,21 @@ public abstract class User implements Serializable {
         return key;
     }
 
+    public String getInfo() {
+
+        StringBuilder txt = new StringBuilder();
+        txt.append("\nSimetric Key Algorithm   : " + pubKey.getAlgorithm());
+        txt.append("\nSimetric Key Size        : " + SIZE_RSA_KEY);
+        txt.append("\nAssimetric Key Algorithm : " + key.getAlgorithm());
+        txt.append("\nAssimetric Key Size      : " + SIZE_AES_KEY);
+        txt.append("\n\nFiles :");
+        txt.append("\n" + USER_PATH + name + ".user");
+        txt.append("\n" + USER_PATH + name + ".pub");
+        txt.append("\n" + USER_PATH + name + ".priv");
+        txt.append("\n" + USER_PATH + name + ".sim");
+        return txt.toString();
+    }
+
     public static void register(User user, String userNumber, String password) throws Exception {
         String path = USER_PATH + userNumber;
         //Create directory if needed

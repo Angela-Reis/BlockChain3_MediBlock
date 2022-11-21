@@ -5,18 +5,8 @@
  */
 package core;
 
-import static core.User.USER_PATH;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +20,7 @@ public class HealthProfessional extends User implements Serializable {
 
     private final String numProfLicense;
 
-    public HealthProfessional(String name, String numProfLicense){
+    public HealthProfessional(String name, String numProfLicense) {
         super(name);
         this.numProfLicense = numProfLicense;
     }
@@ -38,8 +28,6 @@ public class HealthProfessional extends User implements Serializable {
     public String getNumProfLicense() {
         return numProfLicense;
     }
-
-    
 
     public static List<HealthProfessional> getProfessionalsList() {
         List<User> lstUsers = User.getUserList();
@@ -50,7 +38,16 @@ public class HealthProfessional extends User implements Serializable {
     }
 
     @Override
+    public String getInfo() {
+        StringBuilder txt = new StringBuilder();
+        txt.append("Health Professional Information");
+        txt.append("\nName  : " + name);
+        txt.append("\nProfesional License Nº :" + numProfLicense);
+        return txt.append(super.getInfo()).toString(); 
+    }
+
+    @Override
     public String toString() {
-        return name + " - " + numProfLicense; //To change body of generated methods, choose Tools | Templates.
+        return name + " - License nº" + numProfLicense; 
     }
 }

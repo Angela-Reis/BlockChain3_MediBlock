@@ -5,8 +5,6 @@
  */
 package core;
 
-
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,8 +15,6 @@ import java.util.stream.Collectors;
  * 
  * @author AR
  */
-
-
 public class Patient extends User implements Serializable {
     private static final long serialVersionUID = 02L;
 
@@ -37,7 +33,7 @@ public class Patient extends User implements Serializable {
         return dateOfBirth;
     }
 
-    public String getNumUtente() {
+    public String getNumPatient() {
         return numPatient;
     }
 
@@ -46,8 +42,19 @@ public class Patient extends User implements Serializable {
     }
 
     @Override
+    public String getInfo() {
+        StringBuilder txt = new StringBuilder();
+        txt.append("Patient Information");
+        txt.append("\nName  : " + name);
+        txt.append("\nPatient Nº :"  + numPatient);
+        txt.append("\nDate of Birth :" + dateOfBirth);
+        txt.append("\nSex :" + sex);
+        return txt.append(super.getInfo()).toString(); 
+    }
+
+    @Override
     public String toString() {
-        return name + " - " + numPatient;
+        return name + " - Patient Nº " + numPatient;
     }
 
     @Override
@@ -60,7 +67,7 @@ public class Patient extends User implements Serializable {
         }
 
         Patient userCompare = (Patient) obj;
-        if (!userCompare.getNumUtente().equals(this.numPatient)) {
+        if (!userCompare.getNumPatient().equals(this.numPatient)) {
             return false;
         }
         if (!userCompare.getName().equals(this.name)) {
@@ -69,15 +76,14 @@ public class Patient extends User implements Serializable {
         return userCompare.getDateOfBirth().equals(this.dateOfBirth);
 
     }
-    
-    
-    public static List<Patient> getPatientList(){
+
+    public static List<Patient> getPatientList() {
         List<User> lstUsers = User.getUserList();
         return lstUsers.stream()
                 .filter(u -> u instanceof Patient)
                 .map(u -> (Patient) u)
                 .collect(Collectors.toList());
-        
+
     }
 
 }

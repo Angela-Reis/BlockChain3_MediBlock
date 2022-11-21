@@ -25,10 +25,10 @@ public class Exam implements Serializable {
     private static final long serialVersionUID = 02L; // serialization version
     private LocalDateTime dateTest; // date of test
     private Patient user; // user whom the exam is preformed on
-    private String professional; // professional that preforms the exam
+    private HealthProfessional professional; // professional that preforms the exam
     private ArrayList<Analysis> analyses; // Analysis of exam
 
-    public Exam(LocalDateTime dateTest, Patient user, String professional, ArrayList<Analysis> analyses) {
+    public Exam(LocalDateTime dateTest, Patient user, HealthProfessional professional, ArrayList<Analysis> analyses) {
         this.dateTest = dateTest;
         this.user = user;
         this.professional = professional;
@@ -43,7 +43,7 @@ public class Exam implements Serializable {
         return user;
     }
 
-    public String getProfessional() {
+    public HealthProfessional getProfessional() {
         return professional;
     }
 
@@ -84,13 +84,13 @@ public class Exam implements Serializable {
         //order analyses by type
         Collections.sort(analyses);
         
-        String texto = "Nome: " + user.getName();
+        String texto = "Name: " + user.getName();
         Period p = Period.between(user.getDateOfBirth(), LocalDate.now());
-        texto = texto + "\nIdade: " + p.getYears();
-        texto = texto + "\nNº Utente: " + user.getNumUtente();
-        texto = texto + "\nData do Exame: " + dateTest.format(formatter);
+        texto = texto + "\nAge: " + p.getYears();
+        texto = texto + "\nPatient Nº: " + user.getNumPatient();
+        texto = texto + "\nDate of Exam: " + dateTest.format(formatter);
         texto = texto + "\nProfisional: " + professional;
-        texto = texto + "\n\nNome analise\t -\t Resultado";      
+        texto = texto + "\n\nName analysis\t -\t Result";      
         String type = analyses.get(0).getTypeAnalysis();
         texto = texto + "\n\n\t" + type + "\n";
         for (Analysis analysis : analyses) {

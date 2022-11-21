@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
  * 
  * @author AR
  */
-public class MedicalHistory {
+public class MedicalHistory implements Serializable{
 
     private static final long serialVersionUID = 02L; // serialization version
     public static int DIFICULTY = 1; // mining dificulty
@@ -36,7 +37,7 @@ public class MedicalHistory {
     }
 
     /**
-     * Get exam history
+     * Get all exams history
      * @return 
      */
     public List<Exam> getHistory() {
@@ -49,12 +50,12 @@ public class MedicalHistory {
     }
 
     /**
-     * Get user-filtered history
+     * Get history filtered by patient
      * 
      * @param user
      * @return 
      */
-    public List<Exam> getHistoryUser(User user) {
+    public List<Exam> getHistoryPatient(User user) {
         List<Exam> hstUser = new ArrayList<>();
         for (Block b : history.getChain()) {
             Exam e = Exam.fromBase64(b.getData());
@@ -88,6 +89,7 @@ public class MedicalHistory {
         }
     }
 
+    
     /**
      * Load the object representing the blockchain from memory
      * 

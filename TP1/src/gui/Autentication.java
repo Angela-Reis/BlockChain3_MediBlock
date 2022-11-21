@@ -72,7 +72,7 @@ public class Autentication extends javax.swing.JFrame {
         });
 
         txtUser.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        txtUser.setBorder(javax.swing.BorderFactory.createTitledBorder("User Number"));
+        txtUser.setBorder(javax.swing.BorderFactory.createTitledBorder("User ID Number"));
 
         txtPassLogin.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
         txtPassLogin.setToolTipText("");
@@ -106,7 +106,7 @@ public class Autentication extends javax.swing.JFrame {
                 .addComponent(txtPassLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addContainerGap(109, Short.MAX_VALUE))
         );
 
         tbMainAuth.addTab("Login", tabLogin);
@@ -126,6 +126,7 @@ public class Autentication extends javax.swing.JFrame {
         txtRegPatBirth.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter()));
         txtRegPatBirth.setToolTipText("10/10/1990");
         txtRegPatBirth.setAutoscrolls(false);
+        txtRegPatBirth.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
 
         txtRegPatSex.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "F", "M" }));
         txtRegPatSex.setToolTipText("Sex");
@@ -166,15 +167,15 @@ public class Autentication extends javax.swing.JFrame {
                 .addComponent(txtRegPatNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtRegPatBirth, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
-                .addComponent(txtRegPatSex, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(17, 17, 17)
-                .addComponent(txtRegPatPass, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtRegPatRepeatPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRegPatSex, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRegPatPass, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRegPatRepeatPass, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRegisterPatient, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(105, 105, 105))
+                .addGap(91, 91, 91))
         );
 
         txtRegPatSex.getAccessibleContext().setAccessibleDescription("");
@@ -229,7 +230,7 @@ public class Autentication extends javax.swing.JFrame {
                 .addComponent(txtRegProfRepeatPass, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRegisterProfesional, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(137, Short.MAX_VALUE))
+                .addContainerGap(121, Short.MAX_VALUE))
         );
 
         tbMainAuth.addTab("Register Professionals", tabRegProf);
@@ -277,8 +278,8 @@ public class Autentication extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tbMainAuth, javax.swing.GroupLayout.PREFERRED_SIZE, 497, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addComponent(tbMainAuth, javax.swing.GroupLayout.PREFERRED_SIZE, 481, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -310,7 +311,7 @@ public class Autentication extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (listPatients.getSelectedIndex() >= 0) {
             Patient u = (Patient) listPatients.getSelectedValuesList().toArray()[0];
-            txtUser.setText(u.getNumUtente());
+            txtUser.setText(u.getNumPatient());
             txtPassLogin.requestFocus();
             tbMainAuth.setSelectedComponent(tabLogin);
         }
@@ -320,7 +321,7 @@ public class Autentication extends javax.swing.JFrame {
         try {
             User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
             this.dispose();
-            new ExamGUI(user).setVisible(true);
+            new MedicalHistoryGUI(user).setVisible(true);
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -347,7 +348,7 @@ public class Autentication extends javax.swing.JFrame {
         Patient patient = new Patient(txtRegPatName.getText(), date, txtRegPatNumber.getText(), txtRegPatSex.getSelectedItem().toString().charAt(0));
 
         try {
-            User.register(patient, patient.getNumUtente(), new String(txtRegPatPass.getPassword()));
+            User.register(patient, patient.getNumPatient(), new String(txtRegPatPass.getPassword()));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
