@@ -17,7 +17,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Class to create Jframe to authentication
+ * 
  * @author AR
  */
 public class Autentication extends javax.swing.JFrame {

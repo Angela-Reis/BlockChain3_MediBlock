@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Class that represents the patient
+ * 
  * @author AR
  */
 
 
 public class Patient extends User implements Serializable {
-
     private static final long serialVersionUID = 02L;
 
     private final String numPatient;

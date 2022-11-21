@@ -26,7 +26,8 @@ import java.util.logging.Logger;
 import utils.SecurityUtils;
 
 /**
- *
+ * Class that represents the user
+ * 
  * @author AR
  */
 public abstract class User implements Serializable {

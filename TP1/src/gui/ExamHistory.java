@@ -12,7 +12,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Class to create JFrame to create form ExamHistory
  * @author AR
  */
 public class ExamHistory extends javax.swing.JFrame {

@@ -20,7 +20,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Class that represents the health professional
+ * 
  * @author AR
  */
 public class HealthProfessional extends User implements Serializable {
