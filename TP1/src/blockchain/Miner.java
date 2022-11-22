@@ -29,7 +29,7 @@ public class Miner extends Thread {
 
     AtomicInteger ticket;
     String zeros;
-    AtomicInteger sharedNounce;    // objeto partilhado que suporta o valor de PI
+    AtomicInteger sharedNounce;    // shared object for nounce value 
     final String data;
 
     public Miner(AtomicInteger ticket, AtomicInteger sharedNounce, int difficulty, String data) {
@@ -41,8 +41,7 @@ public class Miner extends Thread {
 
     @Override
     public void run() {
-        //tirar um ticket com o numero do termo
-        //termo da serie
+        //take a ticked with the term number
         int term;
         while ((term = ticket.getAndIncrement()) < MAX_NONCE) {
             try {
@@ -59,19 +58,19 @@ public class Miner extends Thread {
     }
 
     public static int getNoncePara(int diff, String dat) throws Exception {
-        //----------- parametrizar o algoritmo para computador actual ---------
+        //Make algorithm for current computer
         int numProcessors = Runtime.getRuntime().availableProcessors();
-        //Distribuidor de trabalho - objecto partilhado
+
         AtomicInteger ticket = new AtomicInteger(0);
         AtomicInteger nonce = new AtomicInteger(0);
-        //array de Threads
+        //array of Threads
         Miner[] thr = new Miner[numProcessors];
-        //----- construir e por a threads a correr -----------
+        //Make and run threads
         for (int i = 0; i < thr.length; i++) {
             thr[i] = new Miner(ticket, nonce, diff, dat);
             thr[i].start();
         }
-        //----- esperar que a threads concluam o trabalho ------
+        //Wait for threads to end working
         int nonceSolved = 0;
         for (Miner thr1 : thr) {
             try {
@@ -85,7 +84,7 @@ public class Miner extends Thread {
                 Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        //----- retornar o objecto partilhado ------
+        //return nonce
         return nonceSolved;
     }
 

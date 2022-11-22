@@ -533,7 +533,6 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
                 txtNameAn.setText("");
                 txtTipoAn.setText("");
                 txtResAn.setText("");
-                txtProf.setText("");
                 jTextArea1.setText("");
                 this.analyses = new ArrayList<>();
 
