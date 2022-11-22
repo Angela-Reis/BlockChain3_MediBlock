@@ -504,7 +504,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         // TODO add your handling code here:
         dispose();
-        new Autentication().setVisible(true);
+        new Authentication().setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void tabBlockChainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabBlockChainStateChanged
