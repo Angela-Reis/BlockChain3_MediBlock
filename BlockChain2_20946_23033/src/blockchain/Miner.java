@@ -32,6 +32,13 @@ public class Miner extends Thread {
     AtomicInteger sharedNounce;    // shared object for nounce value 
     final String data;
 
+    /**
+     * Create a miner to getNonce() with multithreading
+     * @param ticket
+     * @param sharedNounce
+     * @param difficulty
+     * @param data 
+     */
     public Miner(AtomicInteger ticket, AtomicInteger sharedNounce, int difficulty, String data) {
         this.ticket = ticket;
         this.sharedNounce = sharedNounce;
@@ -57,6 +64,13 @@ public class Miner extends Thread {
         }
     }
 
+    /**
+     * Calculate Nonce in a Parallel manner
+     * @param diff
+     * @param dat
+     * @return
+     * @throws Exception 
+     */
     public static int getNoncePara(int diff, String dat) throws Exception {
         //Make algorithm for current computer
         int numProcessors = Runtime.getRuntime().availableProcessors();
@@ -91,6 +105,7 @@ public class Miner extends Thread {
     //maximum number of Nonce
     public static int MAX_NONCE = (int) 1E9;
 
+    //Class to callculate nounce 
     public static long calculateNounce(int digits) throws Exception {
         String d = "Dados para testar";
         long start = System.currentTimeMillis();
@@ -108,7 +123,14 @@ public class Miner extends Thread {
             Logger.getLogger(Miner.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    /**
+     * Calculate nounce in a sequencial manner
+     * @param data
+     * @param dificulty
+     * @return
+     * @throws Exception 
+     */
     public static int getNonce(String data, int dificulty) throws Exception {
         //String of zeros
         String zeros = String.format("%0" + dificulty + "d", 0);
@@ -127,6 +149,14 @@ public class Miner extends Thread {
         return nonce;
     }
 
+    /**
+     * Check if the Nonce is the right one to hash the data with the difficulty
+     * @param data
+     * @param nonce
+     * @param difficulty
+     * @return
+     * @throws Exception 
+     */
     public static boolean ValidateNonce(String data, int nonce, int difficulty) throws Exception {
         String hash = Hash.getHash(nonce + data);
         System.out.println("NONCE = " + nonce + " HASH = " +hash );

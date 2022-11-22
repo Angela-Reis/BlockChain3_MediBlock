@@ -27,7 +27,7 @@ public class Exam implements Serializable {
     private HealthProfessional professional; // professional that preforms the exam
     private ArrayList<Analysis> analyses; // Analysis of exam
 
-    public Exam(LocalDateTime dateTest, Patient patient, HealthProfessional professional, ArrayList<Analysis> analyses) throws Exception {
+    public Exam(LocalDateTime dateTest, Patient patient, HealthProfessional professional, ArrayList<Analysis> analyses) {
         this.dateTest = dateTest;
         this.patient = patient;
         this.professional = professional;

@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import utils.SecurityUtils;
 
 /**
- * Class that represents the user
+ * Abstarct class that represents the user
  *
  * @author AR
  */
@@ -77,6 +77,14 @@ public abstract class User implements Serializable {
         return txt.toString();
     }
 
+    
+    /**
+     * Register a new user, the files will be named with the userNumber
+     * @param user
+     * @param userNumber
+     * @param password
+     * @throws Exception 
+     */
     public static void register(User user, String userNumber, String password) throws Exception {
         String path = USER_PATH + userNumber;
         //Create directory if needed
@@ -94,6 +102,7 @@ public abstract class User implements Serializable {
             oos.writeObject(user);
         }
 
+        //Get users keys
         user.privKey = kp.getPrivate();
         user.pubKey = kp.getPublic();
         user.key = SecurityUtils.generateAESKey(SIZE_AES_KEY);
@@ -109,6 +118,15 @@ public abstract class User implements Serializable {
 
     }
 
+    /**
+     * Load user from file .user, load pubKey
+     * @param userNumber
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws Exception 
+     */
     public static User load(String userNumber) throws FileNotFoundException, IOException, ClassNotFoundException, Exception {
         String path = USER_PATH + userNumber;
         //load user from file 
@@ -121,6 +139,13 @@ public abstract class User implements Serializable {
         }
     }
 
+    /**
+     * Load user from file, deencript keys with password to verify if this is correct
+     * @param userNumber
+     * @param password
+     * @return
+     * @throws Exception 
+     */
     public static User load(String userNumber, String password) throws Exception {
         try {
             User user = load(userNumber);
@@ -134,31 +159,31 @@ public abstract class User implements Serializable {
             //Desencript private key with password
             privData = SecurityUtils.decrypt(privData, password);
             user.privKey = SecurityUtils.getPrivateKey(privData);
-            //desencriptar chave simetrica com a chave privada
+            //Desencript simetric key with private key
             simData = SecurityUtils.decrypt(simData, user.privKey);
             user.key = SecurityUtils.getAESKey(simData);
             return user;
 
         } catch (Exception e) {
-            throw new Exception("Login Data Incorrect ");
+            throw new Exception("Login Data is Incorrect");
         }
     }
 
     public static List<User> getUserList() {
         List<User> lst = new ArrayList<>();
-        //Ler os ficheiros da path dos utilizadores
+        //Read files from USER_PATH
         File[] files = new File(USER_PATH).listFiles();
         if (files == null) {
             return lst;
         }
-        //contruir um user com cada ficheiros
+        //Load the user to a list array
         for (File file : files) {
-            //se for uma chave publica
+            //If its the user object file
             if (file.getName().endsWith(".user")) {
-                //nome do utilizador
-                String userName = file.getName().substring(0, file.getName().lastIndexOf("."));
+                //User id number
+                String userNumber = file.getName().substring(0, file.getName().lastIndexOf("."));
                 try {
-                    lst.add(User.load(userName));
+                    lst.add(User.load(userNumber));
                 } catch (IOException | ClassNotFoundException ex) {
                     Logger.getLogger(Patient.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -171,6 +196,13 @@ public abstract class User implements Serializable {
         return lst;
     }
 
+    
+    /**
+     * Return user from it's public key
+     * @param publicKey
+     * @return
+     * @throws Exception 
+     */
     public static User getFromPublicKey(String publicKey) throws Exception {
         List<User> lst = getUserList();
         PublicKey pk = SecurityUtils.getPublicKey(

@@ -8,7 +8,7 @@ package core;
 import blockchain.Block;
 import blockchain.BlockChain;
 import gui.MineInterface;
-import gui.Miner_Worker;
+import gui.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -110,7 +110,7 @@ public class ExamHistory implements Serializable {
         history.add(t.toBase64(), nonce, difficulty);
     }
 
-    public Miner_Worker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
+    public MinerWorker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
         if (isValid(t)) {
             return history.mineNonceWorker(t.toBase64(), difficulty, gui);
         } else {
