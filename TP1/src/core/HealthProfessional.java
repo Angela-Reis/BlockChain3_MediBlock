@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class HealthProfessional extends User implements Serializable {
 
-    private static final long serialVersionUID = 02L;
+    private static final long serialVersionUID = 04L;
 
     private final String numProfLicense;
 
@@ -24,6 +24,18 @@ public class HealthProfessional extends User implements Serializable {
         super(name);
         this.numProfLicense = numProfLicense;
     }
+
+    /**
+     * Create a copy of HealthProfessional, without private and simetric key
+     * @param prof 
+     */
+    public HealthProfessional(HealthProfessional prof) {
+        super(prof.name);
+        this.numProfLicense = prof.numProfLicense;
+        this.pubKey = prof.getPubKey();
+    }
+    
+    
 
     public String getNumProfLicense() {
         return numProfLicense;

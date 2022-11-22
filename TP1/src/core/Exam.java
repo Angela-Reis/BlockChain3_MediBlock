@@ -12,25 +12,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Date;
 import utils.Serializer;
 
 /**
  * Class that represents the Exam
- * 
+ *
  * @author AR
  */
 public class Exam implements Serializable {
 
     private static final long serialVersionUID = 02L; // serialization version
     private LocalDateTime dateTest; // date of test
-    private Patient user; // user whom the exam is preformed on
+    private Patient patient; // patient whom the exam is preformed on
     private HealthProfessional professional; // professional that preforms the exam
     private ArrayList<Analysis> analyses; // Analysis of exam
 
-    public Exam(LocalDateTime dateTest, Patient user, HealthProfessional professional, ArrayList<Analysis> analyses) {
+    public Exam(LocalDateTime dateTest, Patient patient, HealthProfessional professional, ArrayList<Analysis> analyses) throws Exception {
         this.dateTest = dateTest;
-        this.user = user;
+        this.patient = patient;
         this.professional = professional;
         this.analyses = analyses;
     }
@@ -39,8 +38,8 @@ public class Exam implements Serializable {
         return dateTest;
     }
 
-    public Patient getUtente() {
-        return user;
+    public Patient getPatient() {
+        return patient;
     }
 
     public HealthProfessional getProfessional() {
@@ -74,23 +73,24 @@ public class Exam implements Serializable {
     }
 
     /**
-     * Convert the exam to string with format 'analysis.getName() + "\t-\t"+ analysis.getResult() + "\n"'
-     * 
-     * @return 
+     * Convert the exam to string with format 'analysis.getName() + "\t-\t"+
+     * analysis.getResult() + "\n"'
+     *
+     * @return
      */
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         //order analyses by type
         Collections.sort(analyses);
-        
-        String texto = "Name: " + user.getName();
-        Period p = Period.between(user.getDateOfBirth(), LocalDate.now());
+
+        String texto = "Name: " + patient.getName();
+        Period p = Period.between(patient.getDateOfBirth(), LocalDate.now());
         texto = texto + "\nAge: " + p.getYears();
-        texto = texto + "\nPatient Nº: " + user.getNumPatient();
+        texto = texto + "\nPatient Nº: " + patient.getNumPatient();
         texto = texto + "\nDate of Exam: " + dateTest.format(formatter);
         texto = texto + "\nProfisional: " + professional;
-        texto = texto + "\n\nName analysis\t -\t Result";      
+        texto = texto + "\n\nName analysis\t -\t Result";
         String type = analyses.get(0).getTypeAnalysis();
         texto = texto + "\n\n\t" + type + "\n";
         for (Analysis analysis : analyses) {
@@ -102,7 +102,5 @@ public class Exam implements Serializable {
         }
         return texto;
     }
-    
-    
 
 }

@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
 
 /**
  * Class that represents the patient
- * 
+ *
  * @author AR
  */
 public class Patient extends User implements Serializable {
-    private static final long serialVersionUID = 02L;
+
+    private static final long serialVersionUID = 05L;
 
     private final String numPatient;
     protected final LocalDate dateOfBirth;
@@ -27,6 +28,19 @@ public class Patient extends User implements Serializable {
         this.numPatient = numUtente;
         this.dateOfBirth = dateOfBirth;
         this.sex = sex;
+    }
+
+    /**
+     * Create a copy of Patient, without private and simetric keys
+     *
+     * @param patient
+     */
+    public Patient(Patient patient) {
+        super(patient.name);
+        this.numPatient = patient.numPatient;
+        this.dateOfBirth = patient.dateOfBirth;
+        this.sex = patient.sex;
+        this.pubKey = patient.pubKey;
     }
 
     public LocalDate getDateOfBirth() {
@@ -46,10 +60,10 @@ public class Patient extends User implements Serializable {
         StringBuilder txt = new StringBuilder();
         txt.append("Patient Information");
         txt.append("\nName  : " + name);
-        txt.append("\nPatient Nº :"  + numPatient);
+        txt.append("\nPatient Nº :" + numPatient);
         txt.append("\nDate of Birth :" + dateOfBirth);
         txt.append("\nSex :" + sex);
-        return txt.append(super.getInfo()).toString(); 
+        return txt.append(super.getInfo()).toString();
     }
 
     @Override

@@ -7,9 +7,10 @@ package gui;
 
 import core.Analysis;
 import core.Exam;
+import core.ExamHistory;
 import core.HealthProfessional;
-import core.MedicalHistory;
 import core.Patient;
+import core.Transaction;
 import core.User;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -23,12 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -43,7 +46,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
 
     User user;
     Patient patient;
-    MedicalHistory history;
+    ExamHistory history;
 
     /**
      * Creates new form ExamGUI
@@ -54,38 +57,22 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         this.analyses = new ArrayList<>();
         this.user = user;
         //Load blockChain
-        history = new MedicalHistory();
+        history = new ExamHistory();
         try {
-            history = MedicalHistory.load(fileExamHistory);
-        } catch (IOException | ClassNotFoundException ex) {
+            history = ExamHistory.load(fileExamHistory);
+        } catch (IOException | ClassNotFoundException ex) {}
 
-        }
-
-        /*Testing ------------------------------------
-        try {
-            //Testing
-            this.user = User.load("1");//user Patient;
-            //this.user = User.load("3");//user Professional;
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception ex) {
-            Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-
-        //----------------------------------------------
         initComponents();
 
         //this.user = user;
         if (user instanceof Patient) {
             listUserExams((Patient) user);
-            System.out.println("PATIENT");
             tbExams.setSelectedComponent(tabReadHistory);
             int index = tbExams.indexOfComponent(tabCreateNew);
             tbExams.remove(index);
             index = tbExams.indexOfComponent(tabListPatients);
             tbExams.remove(index);
         } else if (user instanceof HealthProfessional) {
-            System.out.println("HEALTH");
             txtProf.setText(user.toString());
             tbExams.setSelectedComponent(tabCreateNew);
             showPatientsCb();
@@ -147,6 +134,11 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         });
 
         cbPatients.setBorder(javax.swing.BorderFactory.createTitledBorder("Select Patient"));
+        cbPatients.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbPatientsActionPerformed(evt);
+            }
+        });
 
         txtProf.setEditable(false);
         txtProf.setBorder(javax.swing.BorderFactory.createTitledBorder("Health Professional"));
@@ -178,7 +170,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         pnlStateExam.setLayout(pnlStateExamLayout);
         pnlStateExamLayout.setHorizontalGroup(
             pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
             .addGroup(pnlStateExamLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -336,11 +328,11 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             .addGroup(tabReadHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabReadHistoryLayout.createSequentialGroup()
                         .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblUtente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 676, Short.MAX_VALUE))
+                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE))
                         .addGap(2, 2, 2)))
                 .addGap(10, 10, 10))
         );
@@ -362,7 +354,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         UserInformation.setLayout(UserInformationLayout);
         UserInformationLayout.setHorizontalGroup(
             UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 702, Short.MAX_VALUE)
+            .addGap(0, 731, Short.MAX_VALUE)
         );
         UserInformationLayout.setVerticalGroup(
             UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -402,7 +394,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         // TODO add your handling code here:
-        this.dispose();
+        dispose();
         new Autentication().setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
@@ -413,9 +405,10 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             DefaultListModel model = new DefaultListModel();
             model.addAll(Patient.getPatientList());
             listPatients.setModel(model);
-        } else if(actual == tabReadHistory && patient==null ){
-            if(user instanceof Patient)
+        } else if (actual == tabReadHistory) {
+            if (user instanceof Patient || (patient!=null &&  patient.getPrivKey()!=null)) {
                 return;
+            }
             JOptionPane.showMessageDialog(this, "Select a Patient", "Error", JOptionPane.ERROR_MESSAGE);
             tbExams.setSelectedComponent(tabListPatients);
         }
@@ -446,9 +439,9 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             }
             analyses.add(analysis);
             jTextArea1.setText(jTextArea1.getText() + "------ANÁLISE DE " + tipo.toUpperCase()
-                + "(" + nome.toUpperCase() + ")------\n"
-                + "RESULTADO: " + resultado + "\n"
-                + "---------------------------------------------------\n");
+                    + "(" + nome.toUpperCase() + ")------\n"
+                    + "RESULTADO: " + resultado + "\n"
+                    + "---------------------------------------------------\n");
 
         }
     }//GEN-LAST:event_btnAddAnalysisActionPerformed
@@ -456,78 +449,134 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
     private void btnSaveExamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveExamActionPerformed
 
         if (user instanceof HealthProfessional) {
-            //Create new Exam
-            Exam test = new Exam(LocalDateTime.now(), (Patient) cbPatients.getSelectedObjects()[0], (HealthProfessional) user, analyses);
 
-            //Save new Exam
+            //load Health Profesional without private key and simetric key
+            HealthProfessional prof = new HealthProfessional((HealthProfessional) user);
+
+            //Create new Exam
+            Exam exam;
             try {
-                if (!txtProf.getText().isBlank()) {
-                    history.add(test);
-                    history.save(fileExamHistory);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Add Profesional");
+                exam = new Exam(LocalDateTime.now(), (Patient) cbPatients.getSelectedObjects()[0], prof, analyses);
+                Transaction transaction = new Transaction(exam, (HealthProfessional) user);
+                //Save new Exam
+                try {
+                    if (!txtProf.getText().isBlank()) {
+                        history.add(transaction);
+                        history.save(fileExamHistory);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Add Profesional");
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                txtNameAn.setText("");
+                txtTipoAn.setText("");
+                txtResAn.setText("");
+                txtProf.setText("");
+                jTextArea1.setText("");
+                this.analyses = new ArrayList<>();
+
             } catch (Exception ex) {
                 Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Only Health Professionals can add Exams", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        txtNameAn.setText("");
-        txtTipoAn.setText("");
-        txtResAn.setText("");
-        txtProf.setText("");
-        jTextArea1.setText("");
-        this.analyses = new ArrayList<>();
     }//GEN-LAST:event_btnSaveExamActionPerformed
 
+    private void cbPatientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPatientsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbPatientsActionPerformed
+
+    // Only the people the user give the password to can access the data
+    // Since the private key of the patient is needed to Acess the data
+    private String inputPatientPassword(Patient p) {
+        JPanel panel = new JPanel();
+
+        panel.setBounds(61, 11, 81, 140);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JLabel label = new JLabel("Enter " + p.toString() + " Password to View Exams");
+        JPasswordField pass = new JPasswordField();
+        panel.add(label);
+        panel.add(pass);
+        String[] options = new String[]{"OK", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Access Denied",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[1]);
+        if (option == 0) {
+            return new String(pass.getPassword());
+        }
+        return null;
+    }
+
     /**
-     * Loads the page and lists all the exams of an user
+     * Loads the tabReadHistory  and lists all the exams of an user
      */
     private void listUserExams(Patient patient) {
-        panelTestUser.removeAll();
-        lblUtente.setText("Exams of Patient " + patient.getName() + " Nº" + patient.getNumPatient());
-        //get all Exam of the user
-        if (patient == null) {
-            return;
-        }
-        List<Exam> userExams = history.getHistoryPatient(patient);
-        //sort Exam by date from newest to oldest
-        userExams.sort((Exam o1, Exam o2) -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm");
-            //Create String to turn into date
-            String date1 = o1.getDateTest().format(formatter);
-            String date2 = o2.getDateTest().format(formatter);
-            LocalDateTime dateTime1 = LocalDateTime.parse(date1, formatter);
-            LocalDateTime dateTime2 = LocalDateTime.parse(date2, formatter);
-            return dateTime2.compareTo(dateTime1);
-        });
-
-        GridBagConstraints c = new GridBagConstraints();
-        int i = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        for (Exam exam : userExams) {
-            if (exam != null) {
-                i++;
-                String text = exam.getDateTest().format(formatter) + " " + exam.getProfessional();
-                c.gridy = i;
-                c.ipadx = 10;
-                c.weightx = 1;
-                c.weighty = 1;
-                c.anchor = GridBagConstraints.FIRST_LINE_START;
-                c.gridx = 0;
-                panelTestUser.add(new JLabel(exam.getDateTest().format(formatter)), c);
-                c.gridx = 1;
-                panelTestUser.add(new JLabel(exam.getProfessional().getName()), c);
-                c.gridx = 2;
-                panelTestUser.add(new JLabel(String.valueOf(exam.getAnalyses().size())), c);
-                c.gridx = 3;
-                JButton readExam = new JButton("Read Exam");
-                readExam.addActionListener((ActionEvent e) -> {
-                    readExamBtn(exam);
-                });
-                panelTestUser.add(readExam, c);
+        try {
+            if (patient == null) {
+                return;
             }
+            if (!(user instanceof Patient)) {
+                String pass = inputPatientPassword(patient);
+                if (pass != null) {
+                    //load the patient with the private key
+                    patient = (Patient) User.load(patient.getNumPatient(), pass);
+                } else {
+                    JOptionPane.showMessageDialog(null, "The Patient Password is required to Access this data",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    tbExams.setSelectedComponent(tabListPatients);
+                    return;
+                }
+
+            }
+            panelTestUser.removeAll();
+            lblUtente.setText("Exams of Patient " + patient.getName() + " Nº" + patient.getNumPatient());
+            List<Exam> userExams = history.getHistoryPatient(patient, patient.getPrivKey());
+
+            userExams = history.getHistoryPatient(patient, patient.getPrivKey());
+            //sort Exam by date from newest to oldest
+            userExams.sort((Exam o1, Exam o2) -> {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm");
+                //Create String to turn into date
+                String date1 = o1.getDateTest().format(formatter);
+                String date2 = o2.getDateTest().format(formatter);
+                LocalDateTime dateTime1 = LocalDateTime.parse(date1, formatter);
+                LocalDateTime dateTime2 = LocalDateTime.parse(date2, formatter);
+                return dateTime2.compareTo(dateTime1);
+            });
+
+            GridBagConstraints c = new GridBagConstraints();
+            int i = 0;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            for (Exam exam : userExams) {
+                if (exam != null) {
+                    i++;
+                    String text = exam.getDateTest().format(formatter) + " " + exam.getProfessional();
+                    c.gridy = i;
+                    c.ipadx = 10;
+                    c.weightx = 1;
+                    c.weighty = 1;
+                    c.anchor = GridBagConstraints.FIRST_LINE_START;
+                    c.gridx = 0;
+                    panelTestUser.add(new JLabel(exam.getDateTest().format(formatter)), c);
+                    c.gridx = 1;
+                    panelTestUser.add(new JLabel(exam.getProfessional().getName()), c);
+                    c.gridx = 2;
+                    panelTestUser.add(new JLabel(String.valueOf(exam.getAnalyses().size())), c);
+                    c.gridx = 3;
+                    JButton readExam = new JButton("Read Exam");
+                    readExam.addActionListener((ActionEvent e) -> {
+                        readExamBtn(exam);
+                    });
+                    panelTestUser.add(readExam, c);
+                }
+            }
+            revalidate();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        revalidate();
     }
 
     /**
@@ -546,7 +595,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         panel.add(scroll);
-        JOptionPane.showMessageDialog(this, panel, "Exam of Patient " + exam.getUtente().toString(), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, panel, "Exam of Patient " + exam.getPatient().toString(), JOptionPane.INFORMATION_MESSAGE);
 
     }
 
@@ -554,12 +603,12 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
 //    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-/*        try {
+     */
+ /*        try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -577,8 +626,8 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-*/
-        /* Create and display the form */
+     */
+ /* Create and display the form */
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
 //                  new MedicalHistoryGUI().setVisible(true);

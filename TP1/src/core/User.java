@@ -27,20 +27,20 @@ import utils.SecurityUtils;
 
 /**
  * Class that represents the user
- * 
+ *
  * @author AR
  */
 public abstract class User implements Serializable {
 
     public final static String USER_PATH = "user/";
-    private static final long serialVersionUID = 02L;
+    private static final long serialVersionUID = 04L;
     public static int SIZE_RSA_KEY = 2048;
     public static int SIZE_AES_KEY = 256;
 
     protected final String name;
-    PrivateKey privKey;
-    PublicKey pubKey;
-    Key key;
+    protected PrivateKey privKey;
+    protected PublicKey pubKey;
+    protected Key key;
 
     public User(String name) {
         this.name = name;
@@ -129,22 +129,18 @@ public abstract class User implements Serializable {
             byte[] privData = Files.readAllBytes(Paths.get(USER_PATH + userNumber + ".priv"));
             byte[] simData = Files.readAllBytes(Paths.get(USER_PATH + userNumber + ".sim"));
             //Make key with the data received
-            try {
 
-                user.pubKey = SecurityUtils.getPublicKey(pubData);
-                //Desencript private key with password
-                privData = SecurityUtils.decrypt(privData, password);
-                user.privKey = SecurityUtils.getPrivateKey(privData);
-                //desencriptar chave simetrica com a chave privada
-                simData = SecurityUtils.decrypt(simData, user.privKey);
-                user.key = SecurityUtils.getAESKey(simData);
-                return user;
-            } catch (Exception e) {
-                throw new Exception("Wrong Password");
-            }
+            user.pubKey = SecurityUtils.getPublicKey(pubData);
+            //Desencript private key with password
+            privData = SecurityUtils.decrypt(privData, password);
+            user.privKey = SecurityUtils.getPrivateKey(privData);
+            //desencriptar chave simetrica com a chave privada
+            simData = SecurityUtils.decrypt(simData, user.privKey);
+            user.key = SecurityUtils.getAESKey(simData);
+            return user;
 
         } catch (Exception e) {
-            throw new Exception("User Name not Registred :" + e.getMessage());
+            throw new Exception("Login Data Incorrect ");
         }
     }
 
@@ -164,9 +160,11 @@ public abstract class User implements Serializable {
                 try {
                     lst.add(User.load(userName));
                 } catch (IOException | ClassNotFoundException ex) {
-                    Logger.getLogger(Patient.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Patient.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
-                    Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(User.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
