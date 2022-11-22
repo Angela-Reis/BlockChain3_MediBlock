@@ -76,10 +76,6 @@ public class Transaction implements Serializable{
         signature = Base64.getEncoder().encodeToString(s);
     }
 
-    public final void decryptAES() {
-
-    }
-
     public boolean validateSignature() throws Exception {
         //dados da transacao
         byte[] data = (professional + patient + encryptedExam).getBytes();

@@ -38,7 +38,6 @@ public class Miner_Worker extends SwingWorker<Integer, Integer> {
     @Override
     protected Integer doInBackground() throws Exception {
         gui.onStart();
-        System.out.println("DOING IN BACKGROUND");
         //Create threads to mine nonce
         int numProcessors = Runtime.getRuntime().availableProcessors();
         Miner[] thr = new Miner[numProcessors];

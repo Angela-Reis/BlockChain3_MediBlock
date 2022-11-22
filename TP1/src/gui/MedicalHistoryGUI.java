@@ -35,6 +35,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import blockchain.Block;
+import blockchain.Miner;
 
 /**
  *
@@ -43,7 +44,7 @@ import blockchain.Block;
 public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterface {
 
     public static String fileExamHistory = "ExamHistory.obj";
-    public static int DIFICULTY = 3; // mining dificulty
+    public static int DIFICULTY = 4; // mining dificulty
 
     ArrayList<Analysis> analyses;
     Miner_Worker miner;
@@ -70,18 +71,18 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         }
 
         initComponents();
-
+        panelMining.setVisible(false);
         //this.user = user;
         if (user instanceof Patient) {
             listUserExams((Patient) user);
-            tbExams.setSelectedComponent(tabReadHistory);
-            int index = tbExams.indexOfComponent(tabCreateNew);
-            tbExams.remove(index);
-            index = tbExams.indexOfComponent(tabListPatients);
-            tbExams.remove(index);
+            tabBlockChain.setSelectedComponent(tabReadHistory);
+            int index = tabBlockChain.indexOfComponent(lblCreateExam);
+            tabBlockChain.remove(index);
+            index = tabBlockChain.indexOfComponent(tabListPatients);
+            tabBlockChain.remove(index);
         } else if (user instanceof HealthProfessional) {
             txtProf.setText(user.toString());
-            tbExams.setSelectedComponent(tabCreateNew);
+            tabBlockChain.setSelectedComponent(lblCreateExam);
             showPatientsCb();
         }
     }
@@ -104,8 +105,12 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        tbExams = new javax.swing.JTabbedPane();
-        tabCreateNew = new javax.swing.JPanel();
+        panelMining = new javax.swing.JPanel();
+        progressMine = new javax.swing.JProgressBar();
+        jLabel1 = new javax.swing.JLabel();
+        btnCancel = new javax.swing.JButton();
+        tabBlockChain = new javax.swing.JTabbedPane();
+        lblCreateExam = new javax.swing.JPanel();
         cbPatients = new javax.swing.JComboBox<>();
         txtProf = new javax.swing.JTextField();
         txtTipoAn = new javax.swing.JTextField();
@@ -129,19 +134,62 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        UserInformation = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        tabBlock = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         lstBlockchain = new javax.swing.JList<>();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtBlock = new javax.swing.JTextArea();
+        UserInformation = new javax.swing.JPanel();
         btnLogout = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        tbExams.addChangeListener(new javax.swing.event.ChangeListener() {
+        panelMining.setMinimumSize(new java.awt.Dimension(300, 170));
+
+        progressMine.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        progressMine.setString("Nodes Mined = 0");
+        progressMine.setStringPainted(true);
+
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Mining in Progress");
+        jLabel1.setAutoscrolls(true);
+        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+
+        btnCancel.setText("Cancelar");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelMiningLayout = new javax.swing.GroupLayout(panelMining);
+        panelMining.setLayout(panelMiningLayout);
+        panelMiningLayout.setHorizontalGroup(
+            panelMiningLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMiningLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progressMine, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelMiningLayout.setVerticalGroup(
+            panelMiningLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMiningLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelMiningLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(progressMine, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabBlockChain.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                tbExamsStateChanged(evt);
+                tabBlockChainStateChanged(evt);
             }
         });
 
@@ -182,13 +230,13 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         pnlStateExam.setLayout(pnlStateExamLayout);
         pnlStateExamLayout.setHorizontalGroup(
             pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
             .addGroup(pnlStateExamLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(btnSaveExam))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
         );
         pnlStateExamLayout.setVerticalGroup(
             pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,27 +267,27 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         txtResAn.setMinimumSize(new java.awt.Dimension(13, 55));
         txtResAn.setPreferredSize(new java.awt.Dimension(13, 55));
 
-        javax.swing.GroupLayout tabCreateNewLayout = new javax.swing.GroupLayout(tabCreateNew);
-        tabCreateNew.setLayout(tabCreateNewLayout);
-        tabCreateNewLayout.setHorizontalGroup(
-            tabCreateNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabCreateNewLayout.createSequentialGroup()
+        javax.swing.GroupLayout lblCreateExamLayout = new javax.swing.GroupLayout(lblCreateExam);
+        lblCreateExam.setLayout(lblCreateExamLayout);
+        lblCreateExamLayout.setHorizontalGroup(
+            lblCreateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lblCreateExamLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabCreateNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(lblCreateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtNameAn, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtTipoAn, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbPatients, javax.swing.GroupLayout.PREFERRED_SIZE, 415, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtProf, javax.swing.GroupLayout.PREFERRED_SIZE, 415, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabCreateNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(lblCreateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(btnAddAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtResAn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(33, 33, 33)
+                .addGap(18, 18, 18)
                 .addComponent(pnlStateExam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(10, 10, 10))
+                .addContainerGap())
         );
-        tabCreateNewLayout.setVerticalGroup(
-            tabCreateNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabCreateNewLayout.createSequentialGroup()
+        lblCreateExamLayout.setVerticalGroup(
+            lblCreateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lblCreateExamLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addComponent(txtProf, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -253,13 +301,13 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
                 .addGap(18, 18, 18)
                 .addComponent(btnAddAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(tabCreateNewLayout.createSequentialGroup()
+            .addGroup(lblCreateExamLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlStateExam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        tbExams.addTab("Create New Exam", tabCreateNew);
+        tabBlockChain.addTab("Create New Exam", lblCreateExam);
 
         listPatients.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
         listPatients.setModel(new javax.swing.AbstractListModel<String>() {
@@ -274,10 +322,12 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         });
         tabListPatients.setViewportView(listPatients);
 
-        tbExams.addTab("Patients", tabListPatients);
+        tabBlockChain.addTab("Patients", tabListPatients);
 
         tabReadHistory.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        panelTestUser.setMinimumSize(new java.awt.Dimension(1, 1));
+        panelTestUser.setName(""); // NOI18N
         panelTestUser.setLayout(new java.awt.GridBagLayout());
 
         jLabel5.setText("                ");
@@ -340,11 +390,11 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
             .addGroup(tabReadHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 797, Short.MAX_VALUE)
+                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabReadHistoryLayout.createSequentialGroup()
                         .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblUtente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE))
+                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE))
                         .addGap(2, 2, 2)))
                 .addGap(10, 10, 10))
         );
@@ -353,27 +403,14 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
             .addGroup(tabReadHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblUtente)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelHistoryHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollShowEx1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        tbExams.addTab("Exam History", tabReadHistory);
-
-        javax.swing.GroupLayout UserInformationLayout = new javax.swing.GroupLayout(UserInformation);
-        UserInformation.setLayout(UserInformationLayout);
-        UserInformationLayout.setHorizontalGroup(
-            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 821, Short.MAX_VALUE)
-        );
-        UserInformationLayout.setVerticalGroup(
-            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 540, Short.MAX_VALUE)
-        );
-
-        tbExams.addTab("User Information", UserInformation);
+        tabBlockChain.addTab("Exam History", tabReadHistory);
 
         jScrollPane3.setPreferredSize(new java.awt.Dimension(200, 146));
 
@@ -398,31 +435,39 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         txtBlock.setWrapStyleWord(true);
         jScrollPane4.setViewportView(txtBlock);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 621, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addContainerGap(202, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 609, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        javax.swing.GroupLayout tabBlockLayout = new javax.swing.GroupLayout(tabBlock);
+        tabBlock.setLayout(tabBlockLayout);
+        tabBlockLayout.setHorizontalGroup(
+            tabBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBlockLayout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 539, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 1, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+        tabBlockLayout.setVerticalGroup(
+            tabBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBlockLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)))
         );
 
-        tbExams.addTab("BlockChain", jPanel1);
+        tabBlockChain.addTab("BlockChain", tabBlock);
+
+        javax.swing.GroupLayout UserInformationLayout = new javax.swing.GroupLayout(UserInformation);
+        UserInformation.setLayout(UserInformationLayout);
+        UserInformationLayout.setHorizontalGroup(
+            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 718, Short.MAX_VALUE)
+        );
+        UserInformationLayout.setVerticalGroup(
+            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 405, Short.MAX_VALUE)
+        );
+
+        tabBlockChain.addTab("User Information", UserInformation);
 
         btnLogout.setText("Logout");
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
@@ -435,19 +480,22 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tabBlockChain)
+            .addComponent(btnLogout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tbExams, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addComponent(panelMining, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(btnLogout)
+                .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbExams, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE))
+                .addComponent(panelMining, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tabBlockChain, javax.swing.GroupLayout.PREFERRED_SIZE, 433, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -459,9 +507,9 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         new Autentication().setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
-    private void tbExamsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tbExamsStateChanged
+    private void tabBlockChainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabBlockChainStateChanged
         // TODO add your handling code here:
-        Component actual = tbExams.getSelectedComponent();
+        Component actual = tabBlockChain.getSelectedComponent();
         if (actual == tabListPatients) {
             DefaultListModel model = new DefaultListModel();
             model.addAll(Patient.getPatientList());
@@ -471,19 +519,19 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
                 return;
             }
             JOptionPane.showMessageDialog(this, "Select a Patient", "Error", JOptionPane.ERROR_MESSAGE);
-            tbExams.setSelectedComponent(tabListPatients);
+            tabBlockChain.setSelectedComponent(tabListPatients);
         }
         DefaultListModel model = new DefaultListModel();
         model.addAll(history.getBlockChain().getChain());
         lstBlockchain.setModel(model);
-    }//GEN-LAST:event_tbExamsStateChanged
+    }//GEN-LAST:event_tabBlockChainStateChanged
 
     private void listPatientsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listPatientsValueChanged
         // TODO add your handling code here:
         if (listPatients.getSelectedIndex() >= 0) {
             this.patient = (Patient) listPatients.getSelectedValuesList().toArray()[0];
             listUserExams(patient);
-            tbExams.setSelectedComponent(tabReadHistory);
+            tabBlockChain.setSelectedComponent(tabReadHistory);
         }
     }//GEN-LAST:event_listPatientsValueChanged
 
@@ -511,7 +559,10 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
     }//GEN-LAST:event_btnAddAnalysisActionPerformed
 
     private void btnSaveExamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveExamActionPerformed
-
+        if (panelMining.isVisible()) {
+            JOptionPane.showMessageDialog(this, "Can´t add new Exam while uploading another One", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (user instanceof HealthProfessional) {
 
             //load Health Profesional without private key and simetric key
@@ -555,6 +606,16 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
         }
     }//GEN-LAST:event_lstBlockchainValueChanged
 
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        //confirma com o utilizador se pretende mesmo cancelar
+        System.out.println("CLICKED");
+        int option = JOptionPane.showConfirmDialog(this, "Se Cancelar Irá Perder Todos os Resultados", "Aviso Cancelar", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            //cancela a pesquisa
+            miner.cancel(true);
+        }
+    }//GEN-LAST:event_btnCancelActionPerformed
+
     // Only the people the user give the password to can access the data
     // Since the private key of the patient is needed to Acess the data
     private String inputPatientPassword(Patient p) {
@@ -593,7 +654,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
                 } else {
                     JOptionPane.showMessageDialog(null, "The Patient Password is required to Access this data",
                             "Error", JOptionPane.ERROR_MESSAGE);
-                    tbExams.setSelectedComponent(tabListPatients);
+                    tabBlockChain.setSelectedComponent(tabListPatients);
                     return;
                 }
 
@@ -703,56 +764,76 @@ public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterfa
 //   }
     @Override
     public void onStart() {
-        System.out.println("STARTING MINING");
+        startProgressBar();
     }
 
     @Override
     public void onUpdate(int numNounces) {
-        System.out.println("Nº nounce Testados = " + numNounces);
+        progressMine.setString("Nounce = " + numNounces);
+        progressMine.setValue(numNounces);
 
     }
 
     @Override
     public void onFinish(int nFinal) {
+        endProgressBar();
+        if (miner.isCancelled()) {
+            return;
+        }
         try {
-            System.out.println("FIM");
-            System.out.println("NONCE = " + nFinal);
-            history.add(transaction, nFinal , DIFICULTY);
+            history.add(transaction, nFinal, DIFICULTY);
             history.save(fileExamHistory);
+            JOptionPane.showMessageDialog(this, "Exam was added to blockChain ");
         } catch (Exception ex) {
             Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void startProgressBar() {
+        panelMining.setVisible(true);
+        progressMine.setIndeterminate(true);
+        progressMine.setString("Nodes Mined = 0");
+    }
+
+    public void endProgressBar() {
+        panelMining.setVisible(false);
+        progressMine.setIndeterminate(false);
+        progressMine.setString("Nodes Mined = 0");
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel UserInformation;
     private javax.swing.JButton btnAddAnalysis;
+    private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnSaveExam;
     private javax.swing.JComboBox<String> cbPatients;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JPanel lblCreateExam;
     private javax.swing.JLabel lblUtente;
     private javax.swing.JList<String> listPatients;
     private javax.swing.JList<String> lstBlockchain;
     private javax.swing.JPanel panelHistoryHeader;
+    private javax.swing.JPanel panelMining;
     private javax.swing.JPanel panelTestUser;
     private javax.swing.JPanel pnlStateExam;
+    private javax.swing.JProgressBar progressMine;
     private javax.swing.JScrollPane scrollShowEx;
     private javax.swing.JScrollPane scrollShowEx1;
-    private javax.swing.JPanel tabCreateNew;
+    private javax.swing.JPanel tabBlock;
+    private javax.swing.JTabbedPane tabBlockChain;
     private javax.swing.JScrollPane tabListPatients;
     private javax.swing.JPanel tabReadHistory;
-    private javax.swing.JTabbedPane tbExams;
     private javax.swing.JTextArea txtBlock;
     private javax.swing.JTextField txtNameAn;
     private javax.swing.JTextField txtProf;
