@@ -34,15 +34,21 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import blockchain.Block;
 
 /**
  *
  * @author AR
  */
-public class MedicalHistoryGUI extends javax.swing.JFrame {
+public class MedicalHistoryGUI extends javax.swing.JFrame implements MineInterface {
 
     public static String fileExamHistory = "ExamHistory.obj";
+    public static int DIFICULTY = 3; // mining dificulty
+
     ArrayList<Analysis> analyses;
+    Miner_Worker miner;
+    int nonce;
+    Transaction transaction;
 
     User user;
     Patient patient;
@@ -60,7 +66,8 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         history = new ExamHistory();
         try {
             history = ExamHistory.load(fileExamHistory);
-        } catch (IOException | ClassNotFoundException ex) {}
+        } catch (IOException | ClassNotFoundException ex) {
+        }
 
         initComponents();
 
@@ -123,6 +130,11 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         UserInformation = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        lstBlockchain = new javax.swing.JList<>();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        txtBlock = new javax.swing.JTextArea();
         btnLogout = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -170,7 +182,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         pnlStateExam.setLayout(pnlStateExamLayout);
         pnlStateExamLayout.setHorizontalGroup(
             pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+            .addComponent(scrollShowEx, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
             .addGroup(pnlStateExamLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlStateExamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -279,7 +291,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         scrollShowEx1.setViewportView(panelTestUser);
 
         lblUtente.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblUtente.setText("Exams of Patient");
+        lblUtente.setText("Exams of no Patient");
 
         panelHistoryHeader.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         panelHistoryHeader.setLayout(new java.awt.GridBagLayout());
@@ -328,11 +340,11 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             .addGroup(tabReadHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
+                    .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 797, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabReadHistoryLayout.createSequentialGroup()
                         .addGroup(tabReadHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblUtente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE))
+                            .addComponent(panelHistoryHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE))
                         .addGap(2, 2, 2)))
                 .addGap(10, 10, 10))
         );
@@ -341,7 +353,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             .addGroup(tabReadHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblUtente)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
                 .addComponent(panelHistoryHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scrollShowEx1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -354,14 +366,63 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
         UserInformation.setLayout(UserInformationLayout);
         UserInformationLayout.setHorizontalGroup(
             UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 731, Short.MAX_VALUE)
+            .addGap(0, 821, Short.MAX_VALUE)
         );
         UserInformationLayout.setVerticalGroup(
             UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 409, Short.MAX_VALUE)
+            .addGap(0, 540, Short.MAX_VALUE)
         );
 
         tbExams.addTab("User Information", UserInformation);
+
+        jScrollPane3.setPreferredSize(new java.awt.Dimension(200, 146));
+
+        lstBlockchain.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        lstBlockchain.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        lstBlockchain.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lstBlockchainValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(lstBlockchain);
+
+        txtBlock.setEditable(false);
+        txtBlock.setColumns(20);
+        txtBlock.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        txtBlock.setLineWrap(true);
+        txtBlock.setRows(5);
+        txtBlock.setWrapStyleWord(true);
+        jScrollPane4.setViewportView(txtBlock);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 621, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addContainerGap(202, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 609, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 539, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        tbExams.addTab("BlockChain", jPanel1);
 
         btnLogout.setText("Logout");
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
@@ -386,7 +447,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(btnLogout)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbExams))
+                .addComponent(tbExams, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE))
         );
 
         pack();
@@ -406,12 +467,15 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             model.addAll(Patient.getPatientList());
             listPatients.setModel(model);
         } else if (actual == tabReadHistory) {
-            if (user instanceof Patient || (patient!=null &&  patient.getPrivKey()!=null)) {
+            if (!"Exams of no Patient".equals(lblUtente.getText())) {
                 return;
             }
             JOptionPane.showMessageDialog(this, "Select a Patient", "Error", JOptionPane.ERROR_MESSAGE);
             tbExams.setSelectedComponent(tabListPatients);
         }
+        DefaultListModel model = new DefaultListModel();
+        model.addAll(history.getBlockChain().getChain());
+        lstBlockchain.setModel(model);
     }//GEN-LAST:event_tbExamsStateChanged
 
     private void listPatientsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listPatientsValueChanged
@@ -457,15 +521,12 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
             Exam exam;
             try {
                 exam = new Exam(LocalDateTime.now(), (Patient) cbPatients.getSelectedObjects()[0], prof, analyses);
-                Transaction transaction = new Transaction(exam, (HealthProfessional) user);
+                transaction = new Transaction(exam, (HealthProfessional) user);
                 //Save new Exam
                 try {
-                    if (!txtProf.getText().isBlank()) {
-                        history.add(transaction);
-                        history.save(fileExamHistory);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Add Profesional");
-                    }
+                    miner = history.mineBlock(transaction, DIFICULTY, this);
+                    miner.execute();
+
                 } catch (Exception ex) {
                     Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -487,6 +548,13 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
     private void cbPatientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPatientsActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cbPatientsActionPerformed
+
+    private void lstBlockchainValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstBlockchainValueChanged
+        if (lstBlockchain.getSelectedIndex() >= 0) {
+            Block b = (Block) lstBlockchain.getSelectedValues()[0];
+            txtBlock.setText(b.getFullInfo());
+        }
+    }//GEN-LAST:event_lstBlockchainValueChanged
 
     // Only the people the user give the password to can access the data
     // Since the private key of the patient is needed to Acess the data
@@ -511,7 +579,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
     }
 
     /**
-     * Loads the tabReadHistory  and lists all the exams of an user
+     * Loads the tabReadHistory and lists all the exams of an user
      */
     private void listUserExams(Patient patient) {
         try {
@@ -634,6 +702,29 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
 //           }
 //       });
 //   }
+    @Override
+    public void onStart() {
+        System.out.println("STARTING MINING");
+    }
+
+    @Override
+    public void onUpdate(int numNounces) {
+        System.out.println("Nº nounce Testados = " + numNounces);
+
+    }
+
+    @Override
+    public void onFinish(int nFinal) {
+        try {
+            System.out.println("FIM");
+            System.out.println("NONCE = " + nFinal);
+            history.add(transaction, nFinal , DIFICULTY);
+            history.save(fileExamHistory);
+        } catch (Exception ex) {
+            Logger.getLogger(MedicalHistoryGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel UserInformation;
@@ -647,9 +738,13 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel lblUtente;
     private javax.swing.JList<String> listPatients;
+    private javax.swing.JList<String> lstBlockchain;
     private javax.swing.JPanel panelHistoryHeader;
     private javax.swing.JPanel panelTestUser;
     private javax.swing.JPanel pnlStateExam;
@@ -659,6 +754,7 @@ public class MedicalHistoryGUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane tabListPatients;
     private javax.swing.JPanel tabReadHistory;
     private javax.swing.JTabbedPane tbExams;
+    private javax.swing.JTextArea txtBlock;
     private javax.swing.JTextField txtNameAn;
     private javax.swing.JTextField txtProf;
     private javax.swing.JTextField txtResAn;

@@ -7,6 +7,8 @@ package core;
 
 import blockchain.Block;
 import blockchain.BlockChain;
+import gui.MineInterface;
+import gui.Miner_Worker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import java.util.List;
 public class ExamHistory implements Serializable {
 
     private static final long serialVersionUID = 02L; // serialization version
-    public static int DIFICULTY = 1; // mining dificulty
 
     private final BlockChain history; // the blockchain itself
 
@@ -53,15 +54,15 @@ public class ExamHistory implements Serializable {
     }
 
     /**
-     * Get Exam history filtered by patientPubKeyStr get Transactions with patientPubKeyStr
- decript the Exams and sends list with them
+     * Get Exam history filtered by patientPubKeyStr get Transactions with
+     * patientPubKeyStr decript the Exams and sends list with them
      *
      * @param patient
      * @return
      * @throws java.lang.Exception
      */
     public List<Exam> getHistoryPatient(Patient patient, PrivateKey pk) throws Exception {
-        if(pk==null || patient==null){
+        if (pk == null || patient == null) {
             throw new Exception("The patient private key is necessary");
         }
         String patientPubKeyStr = Base64.getEncoder().encodeToString(patient.getPubKey().getEncoded());
@@ -101,11 +102,17 @@ public class ExamHistory implements Serializable {
      * Method to add a block to the blockchain
      *
      * @param t
+     * @param difficulty
+     * @param nonce
      * @throws Exception
      */
-    public void add(Transaction t) throws Exception {
+    public void add(Transaction t, int nonce, int difficulty) throws Exception {
+        history.add(t.toBase64(), nonce, difficulty);
+    }
+
+    public Miner_Worker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
         if (isValid(t)) {
-            history.add(t.toBase64(), DIFICULTY);
+            return history.mineNonceWorker(t.toBase64(), difficulty, gui);
         } else {
             throw new Exception("Transaction not valid");
         }

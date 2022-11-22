@@ -15,6 +15,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package blockchain;
 
+import gui.MineInterface;
+import gui.Miner_Worker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -38,6 +40,7 @@ public class BlockChain implements Serializable {
 
     /**
      * gets the last block hash of the chain
+     *
      * @return last hash in the chain
      */
     public String getLastBlockHash() {
@@ -48,16 +51,52 @@ public class BlockChain implements Serializable {
         //hash of the last in the list
         return chain.get(chain.size() - 1).currentHash;
     }
+
     /**
      * adds data to the blockChain
+     *
      * @param data data to add in the block
      * @param dificulty dificulty of block to miners (POW)
      */
-    public void add(String data, int dificulty) throws Exception {
+    /* public void add(String data, int dificulty) throws Exception {
         //hash of previous block
         String prevHash = getLastBlockHash();
         //mining block
         int nonce = Miner.getNonce(prevHash + data, dificulty);
+        //build new block
+        Block newBlock = new Block(prevHash, data, nonce);
+        //add new block to the chain
+        chain.add(newBlock);
+    }*/
+    /**
+     * Mine data to blockchain with previosly miner_wroker
+     *
+     * @param data
+     * @param difficulty
+     * @param nonce
+     */
+    public Miner_Worker mineNonceWorker(String data, int difficulty, MineInterface gui) throws Exception {
+        //hash of previous block
+        String prevHash = getLastBlockHash();
+        Miner_Worker worker = new Miner_Worker(gui, difficulty, prevHash + data);
+        return worker;
+    }
+
+    /**
+     * adds minedData to blockchain with previosly nonce mined with
+     * mineNonceWorker
+     *
+     * @param data
+     * @param difficulty
+     * @param nonce
+     */
+    public void add(String data, int nonce, int difficulty) throws Exception {
+        //hash of previous block
+        String prevHash = getLastBlockHash();
+        //Validate if nonce given is right
+        if (!Miner.ValidateNonce(prevHash + data, nonce, difficulty)) {
+            throw new Exception("Nonce is wrong");
+        }
         //build new block
         Block newBlock = new Block(prevHash, data, nonce);
         //add new block to the chain
@@ -78,13 +117,13 @@ public class BlockChain implements Serializable {
     }
 
     public void save(String fileName) throws Exception {
-        try ( ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
             out.writeObject(chain);
         }
     }
 
     public void load(String fileName) throws Exception {
-        try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
             this.chain = (ArrayList<Block>) in.readObject();
         }
     }
