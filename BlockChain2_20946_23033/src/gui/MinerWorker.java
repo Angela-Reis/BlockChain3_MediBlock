@@ -15,7 +15,7 @@ import blockchain.Miner;
  *
  * @author AR
  */
-public class Miner_Worker extends SwingWorker<Integer, Integer> {
+public class MinerWorker extends SwingWorker<Integer, Integer> {
 
     MineInterface gui;
 
@@ -24,7 +24,7 @@ public class Miner_Worker extends SwingWorker<Integer, Integer> {
     int difficulty;
     String data;
 
-    public Miner_Worker(MineInterface gui, int difficulty, String data) {
+    public MinerWorker(MineInterface gui, int difficulty, String data) {
         this.gui = gui;
         //Distribuidor de trabalho - objecto partilhado
         numberOfTerm = new AtomicInteger();

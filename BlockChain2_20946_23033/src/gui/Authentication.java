@@ -17,8 +17,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
- * Class to create Jframe to authentication
- * 
+ * Class to create Jframe to authenticate into the platform
+ *
  * @author AR
  */
 public class Authentication extends javax.swing.JFrame {
@@ -288,10 +288,13 @@ public class Authentication extends javax.swing.JFrame {
     private void tbMainAuthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tbMainAuthStateChanged
         // TODO add your handling code here:
         if (tbMainAuth.getSelectedComponent() == tabListPatients) {
+            //If the selected tab is the tabListPatients, show all patients
+
             DefaultListModel model = new DefaultListModel();
             model.addAll(Patient.getPatientList());
             listPatients.setModel(model);
         } else if (tbMainAuth.getSelectedComponent() == tabLstProf) {
+            //If the selected tab is the tabLstProf, show all health professionals
             DefaultListModel model = new DefaultListModel();
             model.addAll(HealthProfessional.getProfessionalsList());
             listProfessionals.setModel(model);
@@ -299,8 +302,10 @@ public class Authentication extends javax.swing.JFrame {
     }//GEN-LAST:event_tbMainAuthStateChanged
 
     private void listProfessionalsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listProfessionalsValueChanged
+        //if a health profesional is selected from the list 
         if (listProfessionals.getSelectedIndex() >= 0) {
             HealthProfessional u = (HealthProfessional) listProfessionals.getSelectedValuesList().toArray()[0];
+            //put the health profesional number into the user id number field
             txtUser.setText(u.getNumProfLicense());
             txtPassLogin.requestFocus();
             tbMainAuth.setSelectedComponent(tabLogin);
@@ -309,7 +314,9 @@ public class Authentication extends javax.swing.JFrame {
 
     private void listPatientsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listPatientsValueChanged
         // TODO add your handling code here:
+        //if a patient is selected from the list 
         if (listPatients.getSelectedIndex() >= 0) {
+            //put the patient number into the user id number field
             Patient u = (Patient) listPatients.getSelectedValuesList().toArray()[0];
             txtUser.setText(u.getNumPatient());
             txtPassLogin.requestFocus();
@@ -319,9 +326,10 @@ public class Authentication extends javax.swing.JFrame {
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         try {
+            //Login to user
             User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
             this.dispose();
-            new MedicalHistoryGUI(user).setVisible(true);
+            new MediBlockGUI(user).setVisible(true);
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -330,6 +338,8 @@ public class Authentication extends javax.swing.JFrame {
 
     private void btnRegisterPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterPatientActionPerformed
         // TODO add your handling code here:
+
+        //verify if all fields are filled
         if (txtRegPatBirth.getText().isBlank()
                 || txtRegPatName.getText().isBlank()
                 || txtRegPatNumber.getText().isBlank()
@@ -339,15 +349,18 @@ public class Authentication extends javax.swing.JFrame {
             return;
         }
 
+        //Check if passwords match
         if (!Arrays.equals(txtRegPatPass.getPassword(), txtRegPatRepeatPass.getPassword())) {
             JOptionPane.showMessageDialog(this, "Passwords don't match");
             return;
         }
-        LocalDate date = LocalDate.parse(txtRegPatBirth.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
+        LocalDate date = LocalDate.parse(txtRegPatBirth.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        //Create new Patient
         Patient patient = new Patient(txtRegPatName.getText(), date, txtRegPatNumber.getText(), txtRegPatSex.getSelectedItem().toString().charAt(0));
 
         try {
+            //Register new Patient to save the user and it's keys to file
             User.register(patient, patient.getNumPatient(), new String(txtRegPatPass.getPassword()));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -356,6 +369,7 @@ public class Authentication extends javax.swing.JFrame {
 
     private void btnRegisterProfesionalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterProfesionalActionPerformed
         // TODO add your handling code here:
+        //verify if all fields are filled
         if (txtRegProfName.getText().isBlank()
                 || txtRegProfNum.getText().isBlank()
                 || txtRegProfPass.getPassword().length == 0) {
@@ -363,6 +377,7 @@ public class Authentication extends javax.swing.JFrame {
             return;
         }
 
+        //Check if passwords match
         if (!Arrays.equals(txtRegPatPass.getPassword(), txtRegPatRepeatPass.getPassword())) {
             JOptionPane.showMessageDialog(this, "Passwords don't match");
             return;
@@ -371,6 +386,7 @@ public class Authentication extends javax.swing.JFrame {
         HealthProfessional prof = new HealthProfessional(txtRegProfName.getText(), txtRegProfNum.getText());
 
         try {
+            //Register new Health Professional to the user and it's keys to file
             User.register(prof, prof.getNumProfLicense(), new String(txtRegPatPass.getPassword()));
         } catch (Exception ex) {
             Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);

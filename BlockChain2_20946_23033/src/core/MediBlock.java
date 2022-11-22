@@ -8,7 +8,7 @@ package core;
 import blockchain.Block;
 import blockchain.BlockChain;
 import gui.MineInterface;
-import gui.Miner_Worker;
+import gui.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,13 +25,13 @@ import java.util.List;
  *
  * @author AR
  */
-public class ExamHistory implements Serializable {
+public class MediBlock implements Serializable {
 
     private static final long serialVersionUID = 02L; // serialization version
 
     private final BlockChain history; // the blockchain itself
 
-    public ExamHistory() {
+    public MediBlock() {
         history = new BlockChain();
     }
 
@@ -110,7 +110,7 @@ public class ExamHistory implements Serializable {
         history.add(t.toBase64(), nonce, difficulty);
     }
 
-    public Miner_Worker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
+    public MinerWorker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
         if (isValid(t)) {
             return history.mineNonceWorker(t.toBase64(), difficulty, gui);
         } else {
@@ -139,10 +139,10 @@ public class ExamHistory implements Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static ExamHistory load(String fileName) throws IOException, ClassNotFoundException {
+    public static MediBlock load(String fileName) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(
                 new FileInputStream(fileName))) {
-            return (ExamHistory) in.readObject();
+            return (MediBlock) in.readObject();
         }
     }
 

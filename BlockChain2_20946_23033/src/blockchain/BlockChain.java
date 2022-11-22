@@ -16,7 +16,7 @@
 package blockchain;
 
 import gui.MineInterface;
-import gui.Miner_Worker;
+import gui.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -68,17 +68,20 @@ public class BlockChain implements Serializable {
         //add new block to the chain
         chain.add(newBlock);
     }*/
+    
     /**
-     * Mine data to blockchain with previosly miner_wroker
+     * Mine data to blockchain with previosly miner_worker
      *
      * @param data
      * @param difficulty
-     * @param nonce
+     * @param gui
+     * @return 
+     * @throws java.lang.Exception
      */
-    public Miner_Worker mineNonceWorker(String data, int difficulty, MineInterface gui) throws Exception {
+    public MinerWorker mineNonceWorker(String data, int difficulty, MineInterface gui) throws Exception {
         //hash of previous block
         String prevHash = getLastBlockHash();
-        Miner_Worker worker = new Miner_Worker(gui, difficulty, prevHash + data);
+        MinerWorker worker = new MinerWorker(gui, difficulty, prevHash + data);
         return worker;
     }
 

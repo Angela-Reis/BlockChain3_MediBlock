@@ -14,7 +14,7 @@ import utils.SecurityUtils;
 import utils.Serializer;
 
 /**
- *
+ * Class that defines the Transaction that goes into the blockchain
  * @author AR
  */
 public class Transaction implements Serializable{
