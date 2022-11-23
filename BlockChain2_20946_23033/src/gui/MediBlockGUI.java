@@ -56,11 +56,8 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
     User user; //Current User
     Patient patient; //Patient the Health Professional is acessing
-<<<<<<< HEAD
-    ExamHistory history; // Class that contains the blockchain
-=======
     MediBlock history; // Class that contains the blockchain
->>>>>>> 711cebebc6d457c6e5988db1c21060cc2339570e
+
 
     /**
      * Creates new form ExamGUI
@@ -71,17 +68,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         this.analyses = new ArrayList<>();
         this.user = user;
         //Create BlockChain 
-<<<<<<< HEAD
-        history = new ExamHistory();
-        try {
-            //If there is a blockChain saved load it
-            history = ExamHistory.load(fileExamHistory);
-=======
         history = new MediBlock();
         try {
             //If there is a blockChain saved load it
             history = MediBlock.load(fileExamHistory);
->>>>>>> 711cebebc6d457c6e5988db1c21060cc2339570e
         } catch (IOException | ClassNotFoundException ex) {
         }
 
