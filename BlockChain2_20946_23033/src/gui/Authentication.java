@@ -378,7 +378,7 @@ public class Authentication extends javax.swing.JFrame {
         }
 
         //Check if passwords match
-        if (!Arrays.equals(txtRegPatPass.getPassword(), txtRegPatRepeatPass.getPassword())) {
+        if (!Arrays.equals(txtRegProfPass.getPassword(), txtRegProfRepeatPass.getPassword())) {
             JOptionPane.showMessageDialog(this, "Passwords don't match");
             return;
         }
@@ -387,7 +387,7 @@ public class Authentication extends javax.swing.JFrame {
 
         try {
             //Register new Health Professional to the user and it's keys to file
-            User.register(prof, prof.getNumProfLicense(), new String(txtRegPatPass.getPassword()));
+            User.register(prof, prof.getNumProfLicense(), new String(txtRegProfPass.getPassword()));
         } catch (Exception ex) {
             Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
         }
