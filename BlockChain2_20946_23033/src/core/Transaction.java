@@ -77,12 +77,12 @@ public class Transaction implements Serializable{
     }
 
     public boolean validateSignature() throws Exception {
-        //dados da transacao
+        //Transaction Data
         byte[] data = (professional + patient + encryptedExam).getBytes();
-        //dados da assinatura
+        //Sign data
         byte[] sign = Base64.getDecoder().decode(signature);
-        //chave publica do from
-        byte[] pk = Base64.getDecoder().decode(patient);
+        //Public Key of professional
+        byte[] pk = Base64.getDecoder().decode(professional);
         PublicKey pubKey = SecurityUtils.getPublicKey(pk);
         return SecurityUtils.verifySign(data, sign, pubKey);
     }
