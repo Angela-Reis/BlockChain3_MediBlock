@@ -90,7 +90,6 @@ public class Miner extends Thread {
             try {
                 thr1.join();
                 if (ValidateNonce(dat, thr1.sharedNounce.get(), diff)) {
-                    System.out.println("STOPPED");
                     nonceSolved = thr1.sharedNounce.get();
                     break;
                 }
@@ -159,7 +158,6 @@ public class Miner extends Thread {
      */
     public static boolean ValidateNonce(String data, int nonce, int difficulty) throws Exception {
         String hash = Hash.getHash(nonce + data);
-        System.out.println("NONCE = " + nonce + " HASH = " +hash );
         return hash.startsWith(String.format("%0" + difficulty + "d", 0));
     }
 
