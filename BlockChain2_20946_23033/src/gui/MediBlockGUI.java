@@ -471,28 +471,36 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
         txtUserInfo.setEditable(false);
         txtUserInfo.setColumns(20);
+        txtUserInfo.setLineWrap(true);
         txtUserInfo.setRows(5);
+        txtUserInfo.setWrapStyleWord(true);
         jScrollPane2.setViewportView(txtUserInfo);
 
         jTabbedPane1.addTab("Info", jScrollPane2);
 
         txtUserPub.setEditable(false);
         txtUserPub.setColumns(20);
+        txtUserPub.setLineWrap(true);
         txtUserPub.setRows(5);
+        txtUserPub.setWrapStyleWord(true);
         jScrollPane5.setViewportView(txtUserPub);
 
         jTabbedPane1.addTab("Public Key", jScrollPane5);
 
         txtUserPriv.setEditable(false);
         txtUserPriv.setColumns(20);
+        txtUserPriv.setLineWrap(true);
         txtUserPriv.setRows(5);
+        txtUserPriv.setWrapStyleWord(true);
         jScrollPane6.setViewportView(txtUserPriv);
 
         jTabbedPane1.addTab("Private Key", jScrollPane6);
 
         txtUserSim.setEditable(false);
         txtUserSim.setColumns(20);
+        txtUserSim.setLineWrap(true);
         txtUserSim.setRows(5);
+        txtUserSim.setWrapStyleWord(true);
         jScrollPane7.setViewportView(txtUserSim);
 
         jTabbedPane1.addTab("Simetric Key", jScrollPane7);
