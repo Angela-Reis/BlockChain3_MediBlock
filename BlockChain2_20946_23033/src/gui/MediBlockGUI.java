@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import blockchain.Block;
 import blockchain.Miner;
+import java.util.Base64;
 
 /**
  *
@@ -97,6 +98,15 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
             //add patients to the comboBox in the create new Exams tab
             showPatientsCb();
         }
+
+        //load user information
+        txtUserInfo.setText(user.getInfo());
+        txtUserPriv.setText(Base64.getEncoder().encodeToString(
+                user.getPrivKey().getEncoded()));
+        txtUserPub.setText(Base64.getEncoder()
+                .encodeToString(user.getPubKey().getEncoded()));
+        txtUserSim.setText(Base64.getEncoder()
+                .encodeToString(user.getKey().getEncoded()));
     }
 
     //Load Patients into comboBox
@@ -150,12 +160,21 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        UserInformation = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtUserInfo = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtUserPub = new javax.swing.JTextArea();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        txtUserPriv = new javax.swing.JTextArea();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        txtUserSim = new javax.swing.JTextArea();
         tabBlock = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         lstBlockchain = new javax.swing.JList<>();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtBlock = new javax.swing.JTextArea();
-        UserInformation = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -444,11 +463,58 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelHistoryHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addComponent(scrollShowEx1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         tabMediBlock.addTab("Exam History", tabReadHistory);
+
+        txtUserInfo.setEditable(false);
+        txtUserInfo.setColumns(20);
+        txtUserInfo.setRows(5);
+        jScrollPane2.setViewportView(txtUserInfo);
+
+        jTabbedPane1.addTab("Info", jScrollPane2);
+
+        txtUserPub.setEditable(false);
+        txtUserPub.setColumns(20);
+        txtUserPub.setRows(5);
+        jScrollPane5.setViewportView(txtUserPub);
+
+        jTabbedPane1.addTab("Public Key", jScrollPane5);
+
+        txtUserPriv.setEditable(false);
+        txtUserPriv.setColumns(20);
+        txtUserPriv.setRows(5);
+        jScrollPane6.setViewportView(txtUserPriv);
+
+        jTabbedPane1.addTab("Private Key", jScrollPane6);
+
+        txtUserSim.setEditable(false);
+        txtUserSim.setColumns(20);
+        txtUserSim.setRows(5);
+        jScrollPane7.setViewportView(txtUserSim);
+
+        jTabbedPane1.addTab("Simetric Key", jScrollPane7);
+
+        javax.swing.GroupLayout UserInformationLayout = new javax.swing.GroupLayout(UserInformation);
+        UserInformation.setLayout(UserInformationLayout);
+        UserInformationLayout.setHorizontalGroup(
+            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UserInformationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1)
+                .addContainerGap())
+        );
+        UserInformationLayout.setVerticalGroup(
+            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UserInformationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1)
+                .addContainerGap())
+        );
+
+        tabMediBlock.addTab("User Information", UserInformation);
 
         jScrollPane3.setPreferredSize(new java.awt.Dimension(200, 146));
 
@@ -489,23 +555,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 .addContainerGap()
                 .addGroup(tabBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane4)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)))
         );
 
         tabMediBlock.addTab("BlockChain", tabBlock);
-
-        javax.swing.GroupLayout UserInformationLayout = new javax.swing.GroupLayout(UserInformation);
-        UserInformation.setLayout(UserInformationLayout);
-        UserInformationLayout.setHorizontalGroup(
-            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 736, Short.MAX_VALUE)
-        );
-        UserInformationLayout.setVerticalGroup(
-            UserInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 410, Short.MAX_VALUE)
-        );
-
-        tabMediBlock.addTab("User Information", UserInformation);
 
         jScrollPane1.setViewportView(tabMediBlock);
 
@@ -701,13 +754,13 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         this.analyses = new ArrayList<>();
     }
 
-
     /**
-     * Ask for Patient password
-     * Only the professionals the patients give the password to can access their history
-     * Since the private key of the patient is needed to Access the data
+     * Ask for Patient password Only the professionals the patients give the
+     * password to can access their history Since the private key of the patient
+     * is needed to Access the data
+     *
      * @param p
-     * @return 
+     * @return
      */
     private String inputPatientPassword(Patient p) {
         JPanel panel = new JPanel();
@@ -729,10 +782,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         return null;
     }
 
-
     /**
      * Loads the tabReadHistory and lists all the exams of an user
-     * @param patient 
+     *
+     * @param patient
      */
     private void listUserExams(Patient patient) {
         try {
@@ -806,7 +859,7 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         JOptionPane.showMessageDialog(this, panel, "Exam of Patient " + exam.getPatient().toString(), JOptionPane.INFORMATION_MESSAGE);
 
     }
-    
+
     //Function overwritten from MineInterface for the MineWorker
     @Override
     public void onStart() {
@@ -854,8 +907,7 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         progressMine.setString("Nodes = 0");
     }
 
-    
-        /**
+    /**
      * @param args the command line arguments
      */
 //    public static void main(String args[]) {
@@ -907,8 +959,13 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel lblCreateExam;
     private javax.swing.JLabel lblUtente;
     private javax.swing.JList<String> listPatients;
@@ -930,5 +987,9 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     private javax.swing.JTextField txtProf;
     private javax.swing.JTextField txtResAn;
     private javax.swing.JTextField txtTypeAn;
+    private javax.swing.JTextArea txtUserInfo;
+    private javax.swing.JTextArea txtUserPriv;
+    private javax.swing.JTextArea txtUserPub;
+    private javax.swing.JTextArea txtUserSim;
     // End of variables declaration//GEN-END:variables
 }

@@ -73,7 +73,7 @@ public class Block implements Serializable {
     
     public String getFullInfo(){
         return "Previous :\n\t " + previousHash+
-                "\ndata  :\n\t" + data+
+                "\nData  :\n\t" + data+
                 "\nNonce : " + nonce+
                 "\nHash  :\n\t"+ currentHash;
     }
