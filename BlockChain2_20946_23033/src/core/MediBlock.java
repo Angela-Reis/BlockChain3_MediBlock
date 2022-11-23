@@ -25,13 +25,13 @@ import java.util.List;
  *
  * @author AR
  */
-public class ExamHistory implements Serializable {
+public class MediBlock implements Serializable {
 
     private static final long serialVersionUID = 02L; // serialization version
 
     private final BlockChain history; // the blockchain itself
 
-    public ExamHistory() {
+    public MediBlock() {
         history = new BlockChain();
     }
 
@@ -139,10 +139,10 @@ public class ExamHistory implements Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static ExamHistory load(String fileName) throws IOException, ClassNotFoundException {
+    public static MediBlock load(String fileName) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(
                 new FileInputStream(fileName))) {
-            return (ExamHistory) in.readObject();
+            return (MediBlock) in.readObject();
         }
     }
 
