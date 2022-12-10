@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -843,8 +844,13 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 "Warning Cancel",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            //cancela a pesquisa
-            miner.cancel(true);
+            try {
+                miner.cancel(true);
+                //stops mining in all the remote servers
+                remoteMiner.stopMining(9999);
+            } catch (RemoteException ex) {
+                Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_btnCancelActionPerformed
 
