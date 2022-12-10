@@ -16,6 +16,7 @@
 package blockchain;
 
 import java.io.Serializable;
+import blockchain.miner.Miner;
 
 /**
  * Created on 22/08/2022, 09:23:49
@@ -40,7 +41,7 @@ public class Block implements Serializable {
     }
 
     public String calculateHash() throws Exception {
-        return Hash.getHash(nonce + previousHash + data);
+        return Miner.getHash(previousHash + data, nonce);
     }
 
     public String toString() {

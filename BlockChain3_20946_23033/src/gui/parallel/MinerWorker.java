@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.parallel;
 
-import java.math.BigDecimal;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingWorker;
-import blockchain.Miner;
+import p2p.miner.IminerRemoteP2P;
 
 /**
  *
@@ -23,8 +23,9 @@ public class MinerWorker extends SwingWorker<Integer, Integer> {
     AtomicInteger nonce;
     int difficulty;
     String data;
+    IminerRemoteP2P remoteMiner;
 
-    public MinerWorker(MineInterface gui, int difficulty, String data) {
+    public MinerWorker(MineInterface gui, int difficulty, String data, IminerRemoteP2P remoteMiner) {
         this.gui = gui;
         //Distribuidor de trabalho - objecto partilhado
         numberOfTerm = new AtomicInteger();
@@ -33,22 +34,31 @@ public class MinerWorker extends SwingWorker<Integer, Integer> {
         //numero de iterações
         this.difficulty = difficulty;
         this.data = data;
+        this.remoteMiner = remoteMiner;
     }
 
     @Override
     protected Integer doInBackground() throws Exception {
         gui.onStart();
-        //Create threads to mine nonce
-        int numProcessors = Runtime.getRuntime().availableProcessors();
-        Miner[] thr = new Miner[numProcessors];
-        for (int i = 0; i < thr.length; i++) {
-            thr[i] = new Miner(numberOfTerm, nonce, difficulty, data);
-            thr[i].start();
-        }
-        while (numberOfTerm.get() < Miner.MAX_NONCE) {
-            //update GPU
-            publish(numberOfTerm.get());
-            Thread.sleep(250);
+//        //Create threads to mine nonce
+//        int numProcessors = Runtime.getRuntime().availableProcessors();
+//        Miner[] thr = new Miner[numProcessors];
+//        for (int i = 0; i < thr.length; i++) {
+//            thr[i] = new Miner(numberOfTerm, nonce, difficulty, data);
+//            thr[i].start();
+//        }
+//        while (numberOfTerm.get() < Miner.MAX_NONCE) {
+//            //update GPU
+//            publish(numberOfTerm.get());
+//            Thread.sleep(250);
+//        }//192.168.1.143:10010/miner
+//        return nonce.get();
+        try {
+            int n = remoteMiner.mine(data, difficulty);
+            nonce.set(n);
+
+        } catch (RemoteException x) {
+            x.printStackTrace();
         }
         return nonce.get();
     }

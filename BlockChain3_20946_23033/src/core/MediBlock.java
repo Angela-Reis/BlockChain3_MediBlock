@@ -7,8 +7,8 @@ package core;
 
 import blockchain.Block;
 import blockchain.BlockChain;
-import gui.MineInterface;
-import gui.MinerWorker;
+import gui.parallel.MineInterface;
+import gui.parallel.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import p2p.miner.IminerRemoteP2P;
 
 /**
  * Class to create the medical history over a blockchain
@@ -110,9 +111,9 @@ public class MediBlock implements Serializable {
         history.add(t.toBase64(), nonce, difficulty);
     }
 
-    public MinerWorker mineBlock(Transaction t, int difficulty, MineInterface gui) throws Exception {
+    public MinerWorker mineBlock(Transaction t, int difficulty, MineInterface gui, IminerRemoteP2P remoteMiner) throws Exception {
         if (isValid(t)) {
-            return history.mineNonceWorker(t.toBase64(), difficulty, gui);
+            return history.mineNonceWorker(t.toBase64(), difficulty, gui, remoteMiner);
         } else {
             throw new Exception("Transaction not valid");
         }

@@ -15,14 +15,16 @@
 //////////////////////////////////////////////////////////////////////////////
 package blockchain;
 
-import gui.MineInterface;
-import gui.MinerWorker;
+import gui.parallel.MineInterface;
+import gui.parallel.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import blockchain.miner.Miner;
+import p2p.miner.IminerRemoteP2P;
 
 /**
  * Created on 22/08/2022, 10:09:17
@@ -78,10 +80,10 @@ public class BlockChain implements Serializable {
      * @return 
      * @throws java.lang.Exception
      */
-    public MinerWorker mineNonceWorker(String data, int difficulty, MineInterface gui) throws Exception {
+    public MinerWorker mineNonceWorker(String data, int difficulty, MineInterface gui,  IminerRemoteP2P remoteMiner) throws Exception {
         //hash of previous block
         String prevHash = getLastBlockHash();
-        MinerWorker worker = new MinerWorker(gui, difficulty, prevHash + data);
+        MinerWorker worker = new MinerWorker(gui, difficulty, prevHash + data, remoteMiner);
         return worker;
     }
 
@@ -96,8 +98,9 @@ public class BlockChain implements Serializable {
     public void add(String data, int nonce, int difficulty) throws Exception {
         //hash of previous block
         String prevHash = getLastBlockHash();
-        //Validate if nonce given is right
-        if (!Miner.ValidateNonce(prevHash + data, nonce, difficulty)) {
+        //verify if hash is correct
+        String hash = Miner.getHash(prevHash + data, nonce);
+        if (!hash.startsWith(String.format("%0" + difficulty + "d", 0))) {
             throw new Exception("Nonce is wrong");
         }
         //build new block
