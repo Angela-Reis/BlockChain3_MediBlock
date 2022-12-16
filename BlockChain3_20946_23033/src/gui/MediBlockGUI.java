@@ -6,6 +6,7 @@
 package gui;
 
 import blockchain.Block;
+import p2p.miner.InterfaceRemoteMiner;
 import core.Analysis;
 import core.Exam;
 import core.HealthProfessional;
@@ -22,8 +23,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,9 +41,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import p2p.miner.IminerRemoteP2P;
-import utils.GuiUtils;
-import utils.RMI;
+import javax.swing.SwingUtilities;
+import myUtils.GuiUtils;
 
 /**
  *
@@ -54,11 +52,11 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
     public static String fileExamHistory = "ExamHistory.obj";
     public static int DIFICULTY = 3; // mining dificulty
-    IminerRemoteP2P remoteMiner;
+    InterfaceRemoteMiner miner;
     //list of analyses currently inputed to the Exam being created
     ArrayList<Analysis> analyses;
     //Miner worker thread to mine the nounce without locking the interface
-    MinerWorker miner;
+    MinerWorker minerWorker;
 
     //Transaction being recorded to the blockchain 
     Transaction transaction;
@@ -71,19 +69,56 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
      * Creates new form ExamGUI
      *
      * @param user
+     * @param remoteMiner
      */
     public MediBlockGUI(User user) {
         this.analyses = new ArrayList<>();
         this.user = user;
+        this.miner = user.getMiner();
         //Create BlockChain 
         history = new MediBlock();
         try {
             //If there is a blockChain saved load it
+            history.setBlockChain(user.getMiner().getBlockChain());
+
+            new Thread(
+                    () -> {
+                        //codigo run da thread
+                        while (true) {
+                            try {
+                                if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
+                                    history.setBlockChain(miner.getBlockChain());
+                                    history.save(fileExamHistory);
+                                    SwingUtilities.invokeLater(
+                                            () -> {
+                                                try {
+                                                    tabMainStateChanged(null);
+                                                    history.save(fileExamHistory);
+                                                } catch (IOException ex) {
+                                                    Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
+                                                }
+                                            }
+                                    );
+
+                                }
+                                Thread.sleep(1000);
+                            } catch (Exception ex) {
+                            }
+
+                        }
+                    }
+            ).start();
             history = MediBlock.load(fileExamHistory);
         } catch (IOException | ClassNotFoundException ex) {
         }
-
         initComponents();
+
+        //Insert Connection in Client Log and change the address textBox to the address of current miner
+        try {
+            GuiUtils.insertText(txtLog, "Connected ", miner.getAdress(), Color.GREEN, Color.MAGENTA);
+        } catch (RemoteException ex) {
+            Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //Hide the panel with the loading interface
         panelMining.setVisible(false);
@@ -109,20 +144,18 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
         spZeros.setValue(DIFICULTY);
 
-        //load user information
-        txtUserInfo.setText(user.getInfo());
+        try {
+            //load user information
+            txtUserInfo.setText(user.getInfo());
+        } catch (RemoteException ex) {
+            Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         txtUserPriv.setText(Base64.getEncoder().encodeToString(
                 user.getPrivKey().getEncoded()));
         txtUserPub.setText(Base64.getEncoder()
                 .encodeToString(user.getPubKey().getEncoded()));
         txtUserSim.setText(Base64.getEncoder()
                 .encodeToString(user.getKey().getEncoded()));
-
-        try {
-            txtAddress.setText("//" + InetAddress.getLocalHost().getHostAddress() + ":" + 10010 + "/" + IminerRemoteP2P.NAME);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     //Load Patients into comboBox
@@ -187,10 +220,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
         jScrollPane7 = new javax.swing.JScrollPane();
         txtUserSim = new javax.swing.JTextArea();
         tabClient = new javax.swing.JPanel();
-        pnServer = new javax.swing.JPanel();
-        pnStartServer = new javax.swing.JPanel();
-        txtAddress = new javax.swing.JTextField();
-        btStartServer = new javax.swing.JButton();
         jScrollPane8 = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextPane();
         spZeros = new javax.swing.JSpinner();
@@ -548,42 +577,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
         tabMain.addTab("User Information", UserInformation);
 
-        pnStartServer.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
-
-        txtAddress.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
-        txtAddress.setText("//192.168.161.15:10010/miner");
-        txtAddress.setBorder(javax.swing.BorderFactory.createTitledBorder("Server Address"));
-
-        btStartServer.setText("Connect To Server ");
-        btStartServer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btStartServerActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnServerLayout = new javax.swing.GroupLayout(pnServer);
-        pnServer.setLayout(pnServerLayout);
-        pnServerLayout.setHorizontalGroup(
-            pnServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnServerLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btStartServer)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnStartServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
-        );
-        pnServerLayout.setVerticalGroup(
-            pnServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnStartServer, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGroup(pnServerLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btStartServer, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-                    .addComponent(txtAddress)))
-        );
-
         jScrollPane8.setPreferredSize(new java.awt.Dimension(64, 400));
 
         txtLog.setBackground(new java.awt.Color(0, 0, 0));
@@ -607,19 +600,14 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
             .addGroup(tabClientLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(tabClientLayout.createSequentialGroup()
-                        .addComponent(pnServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(spZeros, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(spZeros)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 812, Short.MAX_VALUE))
                 .addContainerGap())
         );
         tabClientLayout.setVerticalGroup(
             tabClientLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClientLayout.createSequentialGroup()
-                .addGroup(tabClientLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(spZeros, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnServer, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(spZeros, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addContainerGap())
@@ -726,6 +714,7 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
             DefaultListModel model = new DefaultListModel();
             model.addAll(history.getBlockChain().getChain());
             lstBlockchain.setModel(model);
+
         }
     }//GEN-LAST:event_tabMainStateChanged
 
@@ -804,15 +793,15 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 //Make a new Transaction to add to the blockChain
                 transaction = new Transaction(exam, (HealthProfessional) user);
                 try {
-                    //Check if connect to remote miner
-                    if (remoteMiner == null) {
+                    //Check if connect to remote minerWorker
+                    if (miner == null) {
                         JOptionPane.showMessageDialog(this, "Connect to a Server Before adding Block", "Error", JOptionPane.ERROR_MESSAGE);
                         tabMain.setSelectedComponent(tabClient);
                         return;
                     }
                     //Ask the blockchain to start the thread with the correct data, from the transaction
-                    miner = history.mineBlock(transaction, DIFICULTY, this, remoteMiner);
-                    miner.execute();
+                    minerWorker = history.mineBlock(transaction, DIFICULTY, this, miner);
+                    minerWorker.execute();
 
                 } catch (Exception ex) {
                     Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -845,9 +834,9 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                miner.cancel(true);
+                minerWorker.cancel(true);
                 //stops mining in all the remote servers
-                remoteMiner.stopMining(9999);
+                miner.stopMining(9999);
             } catch (RemoteException ex) {
                 Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -864,17 +853,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
             cleanNewExamTab();
         }
     }//GEN-LAST:event_btnDeleteExamActionPerformed
-
-    private void btStartServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStartServerActionPerformed
-        try {
-            remoteMiner = (IminerRemoteP2P) RMI.getRemote(txtAddress.getText());
-            tabMain.setSelectedComponent(tabCreateExam);
-            GuiUtils.insertText(txtLog, "Connected ", remoteMiner.getAdress(), Color.GREEN, Color.MAGENTA);
-        } catch (Exception ex) {
-            System.out.println("HI2");
-            GuiUtils.insertText(txtLog, "Start Remote", ex.getMessage(), Color.RED, Color.MAGENTA);
-        }
-    }//GEN-LAST:event_btStartServerActionPerformed
 
     private void spZerosStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spZerosStateChanged
         // TODO add your handling code here:
@@ -1011,11 +989,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     @Override
     public void onFinish(int nFinal) {
         endProgressBar();
-        if (miner.isCancelled()) {
+        if (minerWorker.isCancelled()) {
             return;
         }
         try {
-            history.add(transaction, nFinal, DIFICULTY);
             history.save(fileExamHistory);
             JOptionPane.showMessageDialog(this, "Exam was added to blockChain Nonce = " + nFinal);
         } catch (Exception ex) {
@@ -1077,7 +1054,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel UserInformation;
-    private javax.swing.JButton btStartServer;
     private javax.swing.JButton btnAddAnalysis;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDeleteExam;
@@ -1106,8 +1082,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     private javax.swing.JPanel panelHistoryHeader;
     private javax.swing.JPanel panelMining;
     private javax.swing.JPanel panelTestUser;
-    private javax.swing.JPanel pnServer;
-    private javax.swing.JPanel pnStartServer;
     private javax.swing.JPanel pnlStateExam;
     private javax.swing.JProgressBar progressMine;
     private javax.swing.JScrollPane scrollShowEx;
@@ -1119,7 +1093,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     private javax.swing.JScrollPane tabListPatients;
     private javax.swing.JTabbedPane tabMain;
     private javax.swing.JPanel tabReadHistory;
-    private javax.swing.JTextField txtAddress;
     private javax.swing.JTextArea txtAnalyses;
     private javax.swing.JTextArea txtBlock;
     private javax.swing.JTextPane txtLog;

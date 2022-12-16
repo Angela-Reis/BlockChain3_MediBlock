@@ -4,6 +4,7 @@
  */
 package core;
 
+import p2p.miner.InterfaceRemoteMiner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.rmi.RemoteException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -23,7 +25,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utils.SecurityUtils;
+import myUtils.SecurityUtils;
 
 /**
  * Abstarct class that represents the user
@@ -41,6 +43,7 @@ public abstract class User implements Serializable {
     protected PrivateKey privKey;
     protected PublicKey pubKey;
     protected Key key;
+    private InterfaceRemoteMiner miner;
 
     public User(String name) {
         this.name = name;
@@ -62,7 +65,7 @@ public abstract class User implements Serializable {
         return key;
     }
 
-    public String getInfo() {
+    public String getInfo() throws RemoteException {
 
         StringBuilder txt = new StringBuilder();
         txt.append("\nSimetric Key Algorithm   : " + pubKey.getAlgorithm());
@@ -74,16 +77,17 @@ public abstract class User implements Serializable {
         txt.append("\n" + USER_PATH + name + ".pub");
         txt.append("\n" + USER_PATH + name + ".priv");
         txt.append("\n" + USER_PATH + name + ".sim");
+        txt.append("\nAddress" + miner.getAdress());
         return txt.toString();
     }
 
-    
     /**
      * Register a new user, the files will be named with the userNumber
+     *
      * @param user
      * @param userNumber
      * @param password
-     * @throws Exception 
+     * @throws Exception
      */
     public static void register(User user, String userNumber, String password) throws Exception {
         String path = USER_PATH + userNumber;
@@ -91,7 +95,7 @@ public abstract class User implements Serializable {
         new File(USER_PATH).mkdirs();
         //Create users
         //Generate keys
-        KeyPair kp = SecurityUtils.generateRSAKeyPair(SIZE_RSA_KEY);
+        KeyPair kp = SecurityUtils.generateKeyPair(SIZE_RSA_KEY);
         if (new File(path + ".user").exists()) {
             throw new Exception("User with this number already exists");
         }
@@ -120,12 +124,13 @@ public abstract class User implements Serializable {
 
     /**
      * Load user from file .user, load pubKey
+     *
      * @param userNumber
      * @return
      * @throws FileNotFoundException
      * @throws IOException
      * @throws ClassNotFoundException
-     * @throws Exception 
+     * @throws Exception
      */
     public static User load(String userNumber) throws FileNotFoundException, IOException, ClassNotFoundException, Exception {
         String path = USER_PATH + userNumber;
@@ -140,11 +145,13 @@ public abstract class User implements Serializable {
     }
 
     /**
-     * Load user from file, deencript keys with password to verify if this is correct
+     * Load user from file, deencript keys with password to verify if this is
+     * correct
+     *
      * @param userNumber
      * @param password
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public static User load(String userNumber, String password) throws Exception {
         try {
@@ -165,6 +172,7 @@ public abstract class User implements Serializable {
             return user;
 
         } catch (Exception e) {
+            System.out.println("RESET");
             throw new Exception("Login Data is Incorrect");
         }
     }
@@ -196,12 +204,12 @@ public abstract class User implements Serializable {
         return lst;
     }
 
-    
     /**
      * Return user from it's public key
+     *
      * @param publicKey
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public static User getFromPublicKey(String publicKey) throws Exception {
         List<User> lst = getUserList();
@@ -215,5 +223,13 @@ public abstract class User implements Serializable {
             }
         }
         return null;
+    }
+
+    public InterfaceRemoteMiner getMiner() {
+        return miner;
+    }
+
+    public void setMiner(InterfaceRemoteMiner miner) {
+        this.miner = miner;
     }
 }

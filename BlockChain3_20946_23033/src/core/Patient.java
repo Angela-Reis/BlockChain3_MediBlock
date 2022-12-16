@@ -6,6 +6,7 @@
 package core;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class Patient extends User implements Serializable {
     }
 
     @Override
-    public String getInfo() {
+    public String getInfo() throws RemoteException {
         StringBuilder txt = new StringBuilder();
         txt.append("Patient Information");
         txt.append("\nName  : " + name);

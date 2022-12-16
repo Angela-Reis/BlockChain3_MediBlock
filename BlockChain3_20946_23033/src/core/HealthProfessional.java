@@ -6,6 +6,7 @@
 package core;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class HealthProfessional extends User implements Serializable {
     }
 
     @Override
-    public String getInfo() {
+    public String getInfo() throws RemoteException {
         StringBuilder txt = new StringBuilder();
         txt.append("Health Professional Information");
         txt.append("\nName  : " + name);

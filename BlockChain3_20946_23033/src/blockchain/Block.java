@@ -15,12 +15,18 @@
 //////////////////////////////////////////////////////////////////////////////
 package blockchain;
 
-import java.io.Serializable;
+
 import blockchain.miner.Miner;
+import java.io.Serializable;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import myUtils.MerkleTree;
+import myUtils.Serializer;
 
 /**
  * Created on 22/08/2022, 09:23:49
- * 
+ *
  * Block with consensus of Proof of Work
  *
  * @author IPT - computer
@@ -29,31 +35,83 @@ import blockchain.miner.Miner;
 public class Block implements Serializable {
 
     String previousHash; // link to previous block
-    String data;         // data in the block
+    String merkleRoot;         // data in the block
+    
+    
+    String merkleTree; // full merkle tree with elements
+    
+    int zeros;           //number of zeros  
     int nonce;           // proof of work 
     String currentHash;  // Hash of block
 
-    public Block(String previousHash, String data, int nonce) throws Exception {
+    public Block(String previousHash, String data, int zeros) throws Exception {
         this.previousHash = previousHash;
-        this.data = data;
-        this.nonce = nonce;
-        this.currentHash = calculateHash();
+        this.merkleRoot = data;
+        this.zeros = zeros;
+    }
+    
+     public Block(String previousHash, int zeros, String ...elements) throws Exception {
+        this.previousHash = previousHash;
+        this.zeros = zeros;
+        
+         MerkleTree<String> mk = new MerkleTree<>(elements);
+         this.merkleRoot = Base64.getEncoder().encodeToString(mk.getRoot());
+         this.merkleTree = Base64.getEncoder().encodeToString(
+         Serializer.objectToByteArray(mk)
+         );
+    }
+     
+     public List<String> getTransactions() throws Exception{
+         MerkleTree<String> mk = (MerkleTree<String>)
+                 Serializer.byteArrayToObject( Base64.getDecoder().decode(merkleTree));
+         
+         return mk.getElements();
+     }
+
+
+
+    public void setNonce(int newNonce) throws Exception {
+        String hash = calculateHash(newNonce);
+        String zzz = String.format("%0" + zeros + "d", 0);
+        //hash is valid
+        if ( !hash.startsWith(zzz)) {
+            throw new Exception("Wrong nonce");
+        }
+        this.currentHash = hash;
+        this.nonce = newNonce;
+    }
+
+    public String getHeader() {
+        return previousHash + merkleRoot + zeros;
     }
 
     public String calculateHash() throws Exception {
-        return Miner.getHash(previousHash + data, nonce);
+        return calculateHash(nonce);
     }
 
+    public String calculateHash(int nonce) throws Exception {
+        return Miner.getHash(getHeader(), nonce);
+    }
+
+    @Override
     public String toString() {
         return // (isValid() ? "OK\t" : "ERROR\t")+
-                 String.format("[ %8s", previousHash) + " <- " + 
-                   String.format("%-10s", data) +  String.format(" %7d ] = ", nonce) + 
-                String.format("%8s",currentHash);
+                String.format("[ %8s", previousHash) + " <- "
+                + String.format("%-10s", merkleRoot) + String.format(" %7d ] = ", nonce)
+                + " " + zeros + ""
+                + String.format("%8s", currentHash);
 
     }
 
     public boolean isValid() throws Exception {
-        return currentHash.equals(calculateHash());
+        try {
+            String hash = calculateHash();
+            String zzz = String.format("%0" + zeros + "d", 0);
+            return currentHash.equals(hash) && hash.startsWith(zzz);
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 
     public String getPreviousHash() {
@@ -61,7 +119,7 @@ public class Block implements Serializable {
     }
 
     public String getData() {
-        return data;
+        return merkleRoot;
     }
 
     public int getNonce() {
@@ -71,13 +129,42 @@ public class Block implements Serializable {
     public String getCurrentHash() {
         return currentHash;
     }
-    
-    public String getFullInfo(){
-        return "Previous :\n\t " + previousHash+
-                "\nData  :\n\t" + data+
-                "\nNonce : " + nonce+
-                "\nHash  :\n\t"+ currentHash;
+
+    public int getZeros() {
+        return zeros;
     }
+
+    public String getFullInfo() {
+        return "Previous :\n\t " + previousHash
+                + "\ndata  :\n\t" + merkleRoot
+                + "\nNonce : " + nonce
+                + "\nZeros : " + zeros
+                + "\nHash  :\n\t" + currentHash;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Block other = (Block) obj;
+        return Objects.equals(this.previousHash, other.previousHash);
+    }
+    
+    
+    
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     private static final long serialVersionUID = 202208220923L;

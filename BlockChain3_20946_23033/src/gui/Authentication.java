@@ -5,16 +5,25 @@
  */
 package gui;
 
+import p2p.miner.InterfaceRemoteMiner;
 import core.HealthProfessional;
 import core.Patient;
 import core.User;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.WindowConstants;
+import myUtils.RMI;
+
+
 
 /**
  * Class to create Jframe to authenticate into the platform
@@ -28,6 +37,15 @@ public class Authentication extends javax.swing.JFrame {
      */
     public Authentication() {
         initComponents();
+
+        try {
+            //set default address as localhost address
+            txtAddress.setText("//" + InetAddress.getLocalHost().getHostAddress() + ":" + 10010 + "/" + InterfaceRemoteMiner.NAME);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
     }
 
     /**
@@ -44,6 +62,7 @@ public class Authentication extends javax.swing.JFrame {
         txtUser = new javax.swing.JTextField();
         txtPassLogin = new javax.swing.JPasswordField();
         btnLogin = new javax.swing.JButton();
+        txtAddress = new javax.swing.JTextField();
         tabReg = new javax.swing.JPanel();
         txtRegPatPass = new javax.swing.JPasswordField();
         txtRegPatRepeatPass = new javax.swing.JPasswordField();
@@ -85,6 +104,10 @@ public class Authentication extends javax.swing.JFrame {
             }
         });
 
+        txtAddress.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        txtAddress.setText("//192.168.161.15:10010/miner");
+        txtAddress.setBorder(javax.swing.BorderFactory.createTitledBorder("Server Address"));
+
         javax.swing.GroupLayout tabLoginLayout = new javax.swing.GroupLayout(tabLogin);
         tabLogin.setLayout(tabLoginLayout);
         tabLoginLayout.setHorizontalGroup(
@@ -94,7 +117,8 @@ public class Authentication extends javax.swing.JFrame {
                 .addGroup(tabLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnLogin, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
                     .addComponent(txtPassLogin)
-                    .addComponent(txtUser))
+                    .addComponent(txtUser)
+                    .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))
                 .addContainerGap())
         );
         tabLoginLayout.setVerticalGroup(
@@ -105,8 +129,10 @@ public class Authentication extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(txtPassLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(109, Short.MAX_VALUE))
+                .addGap(26, 26, 26))
         );
 
         tbMainAuth.addTab("Login", tabLogin);
@@ -326,14 +352,37 @@ public class Authentication extends javax.swing.JFrame {
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         try {
+            final JOptionPane optionPane = new JOptionPane("Please Wait Trying to Connect to Server");
+            optionPane.setOptions(new Object[]{});
+            
+            JProgressBar bar = new JProgressBar();
+            bar.setIndeterminate(true);
+            optionPane.add(bar);
+            
+            JDialog dialog = optionPane.createDialog(this, "Connecting");
+            dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            
             //Login to user
-            User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
-            this.dispose();
-            new MediBlockGUI(user).setVisible(true);
 
+            
+           // new Thread(() -> {
+                try {
+                    User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
+                    InterfaceRemoteMiner remoteMiner = (InterfaceRemoteMiner) RMI.getRemote(txtAddress.getText());
+                    user.setMiner(remoteMiner);
+                    
+                    this.dispose();
+                    new MediBlockGUI(user).setVisible(true);
+                } catch (Exception ex) {
+                    Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            
+           /* }).start();
+            dialog.setVisible(true);*/
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnRegisterPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterPatientActionPerformed
@@ -443,6 +492,7 @@ public class Authentication extends javax.swing.JFrame {
     private javax.swing.JPanel tabReg;
     private javax.swing.JPanel tabRegProf;
     private javax.swing.JTabbedPane tbMainAuth;
+    private javax.swing.JTextField txtAddress;
     private javax.swing.JPasswordField txtPassLogin;
     private javax.swing.JFormattedTextField txtRegPatBirth;
     private javax.swing.JTextField txtRegPatName;

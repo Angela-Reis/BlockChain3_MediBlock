@@ -5,11 +5,11 @@
  */
 package gui.parallel;
 
+import p2p.miner.InterfaceRemoteMiner;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingWorker;
-import p2p.miner.IminerRemoteP2P;
 
 /**
  *
@@ -23,9 +23,9 @@ public class MinerWorker extends SwingWorker<Integer, Integer> {
     AtomicInteger nonce;
     int difficulty;
     String data;
-    IminerRemoteP2P remoteMiner;
+    InterfaceRemoteMiner remoteMiner;
 
-    public MinerWorker(MineInterface gui, int difficulty, String data, IminerRemoteP2P remoteMiner) {
+    public MinerWorker(MineInterface gui, int difficulty, String data, InterfaceRemoteMiner remoteMiner) {
         this.gui = gui;
         //Distribuidor de trabalho - objecto partilhado
         numberOfTerm = new AtomicInteger();

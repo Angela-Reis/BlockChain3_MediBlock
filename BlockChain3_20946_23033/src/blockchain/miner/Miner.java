@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package blockchain.miner;
 
+import blockchain.Block;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Random;
@@ -60,7 +61,7 @@ public class Miner {
         if (isMining()) {
             return; // Sair
         }
-         //notificar o listener
+        //notificar o listener
         if (listener != null) {
             listener.onStartMining(message, zeros);
         }
@@ -69,7 +70,7 @@ public class Miner {
         Random rnd = new Random();
         ticket = new AtomicInteger(Math.abs(rnd.nextInt() / 2));
         //configurar os atributos    
-        int numCores = Runtime.getRuntime().availableProcessors();
+        int numCores = 4;//Runtime.getRuntime().availableProcessors();
         threads = new MinerThread[numCores];
         exe = Executors.newFixedThreadPool(numCores);
         //inicializar o globalNonce
@@ -82,7 +83,7 @@ public class Miner {
         }
         //fechar a pool
         exe.shutdown();
-       
+
     }
 
     /**
@@ -124,8 +125,9 @@ public class Miner {
     public int getNonce() {
         return globalNonce.get();
     }
-      /**
-     *mensagem
+
+    /**
+     * mensagem
      *
      * @return message
      */
@@ -167,6 +169,21 @@ public class Miner {
         return globalNonce.get();
     }
 
+    /**
+     * valida um bloco
+     *
+     * @param b block
+     * @param message mensagem
+     * @return
+     * @throws Exception
+     */
+    public Block mine(Block b) throws Exception {
+        startMining(b.getHeader(), b.getZeros());
+        exe.awaitTermination(1, TimeUnit.DAYS);
+        b.setNonce(globalNonce.get());
+        return b;
+    }
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //:::::::::      I N T E G R I T Y         :::::::::::::::::::::::::::::::::    
     ///////////////////////////////////////////////////////////////////////////
@@ -189,9 +206,10 @@ public class Miner {
 
     /**
      * calcula a hash da mensagem em Base64
+     *
      * @param data mensagem
      * @return Base64(hash(data))
-     * @throws Exception 
+     * @throws Exception
      */
     public static String getHash(String data) throws Exception {
         MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
