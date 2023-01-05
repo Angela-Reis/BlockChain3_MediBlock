@@ -6,8 +6,9 @@
 package p2p.miner;
 
 
-import blockchain.Block;
-import blockchain.BlockChain;
+
+import blockchain.chain.Block;
+import blockchain.chain.BlockChain;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;

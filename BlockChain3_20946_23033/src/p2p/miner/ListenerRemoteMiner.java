@@ -15,8 +15,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package p2p.miner;
 
-import blockchain.Block;
+import blockchain.chain.Block;
 import blockchain.miner.MiningListener;
+
 
 
 

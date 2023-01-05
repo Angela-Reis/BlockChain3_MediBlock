@@ -172,7 +172,6 @@ public abstract class User implements Serializable {
             return user;
 
         } catch (Exception e) {
-            System.out.println("RESET");
             throw new Exception("Login Data is Incorrect");
         }
     }

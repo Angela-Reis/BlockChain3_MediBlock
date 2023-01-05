@@ -16,8 +16,9 @@
 package p2p.miner;
 
 
-import blockchain.Block;
-import blockchain.BlockChain;
+
+import blockchain.chain.Block;
+import blockchain.chain.BlockChain;
 import blockchain.miner.Miner;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

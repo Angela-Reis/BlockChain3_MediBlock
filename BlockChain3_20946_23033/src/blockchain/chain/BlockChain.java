@@ -13,12 +13,10 @@
 //::                                                               (c)2022   ::
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //////////////////////////////////////////////////////////////////////////////
-package blockchain;
+package blockchain.chain;
+
 
 import blockchain.miner.Miner;
-import p2p.miner.InterfaceRemoteMiner;
-import gui.parallel.MineInterface;
-import gui.parallel.MinerWorker;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -43,6 +41,7 @@ public class BlockChain implements Serializable {
     public BlockChain() {
         try {
             chain = new ArrayList<>();
+            add(Block.createGenesys());
         } catch (Exception ex) {
         }
     }
@@ -110,13 +109,13 @@ public class BlockChain implements Serializable {
     }
 
     public void save(String fileName) throws Exception {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+        try ( ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
             out.writeObject(chain);
         }
     }
 
     public void load(String fileName) throws Exception {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+        try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
             this.chain = (ArrayList<Block>) in.readObject();
         }
     }
@@ -137,22 +136,6 @@ public class BlockChain implements Serializable {
             }
         }
         return true;
-    }
-    
-        /**
-     * Mine data to blockchain with previosly miner_worker
-     *
-     * @param data
-     * @param difficulty
-     * @param gui
-     * @return 
-     * @throws java.lang.Exception
-     */
-    public MinerWorker mineNonceWorker(String data, int difficulty, MineInterface gui,  InterfaceRemoteMiner remoteMiner) throws Exception {
-        //hash of previous block
-        String prevHash = getLastBlockHash();
-        MinerWorker worker = new MinerWorker(gui, difficulty, prevHash + data, remoteMiner);
-        return worker;
     }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

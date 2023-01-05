@@ -5,11 +5,8 @@
  */
 package core;
 
-import blockchain.Block;
-import blockchain.BlockChain;
-import p2p.miner.InterfaceRemoteMiner;
-import gui.parallel.MineInterface;
-import gui.parallel.MinerWorker;
+import blockchain.chain.Block;
+import blockchain.chain.BlockChain;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +17,8 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class to create the medical history over a blockchain
@@ -48,8 +47,11 @@ public class MediBlock implements Serializable {
     public List<Transaction> getTransactions() {
         List<Transaction> hst = new ArrayList<>();
         for (Block b : history.getChain()) {
-            Transaction e = Transaction.fromBase64(b.getData());
-            hst.add(e);
+            try {
+                Transaction e = Transaction.fromBase64(b.getData());
+                hst.add(e);
+            } catch (IOException | ClassNotFoundException ex) {
+            }
         }
         return hst;
     }
@@ -70,9 +72,13 @@ public class MediBlock implements Serializable {
         List<Exam> hstPatient = new ArrayList<>();
         for (Block b : history.getChain()) {
             //get Transaction
-            Transaction transaction = Transaction.fromBase64(b.getData());
-            if (transaction.getPatient().equals(patientPubKeyStr)) {
-                hstPatient.add(transaction.getDecodedExam(pk));
+            Transaction transaction;
+            try {
+                transaction = Transaction.fromBase64(b.getData());
+                if (transaction.getPatient().equals(patientPubKeyStr)) {
+                    hstPatient.add(transaction.getDecodedExam(pk));
+                }
+            } catch (IOException | ClassNotFoundException ex) {
             }
         }
         return hstPatient;
@@ -109,14 +115,6 @@ public class MediBlock implements Serializable {
      */
     public void add(Transaction t, int difficulty) throws Exception {
         history.add(t.toBase64(), difficulty);
-    }
-
-    public MinerWorker mineBlock(Transaction t, int difficulty, MineInterface gui, InterfaceRemoteMiner remoteMiner) throws Exception {
-        if (isValid(t)) {
-            return history.mineNonceWorker(t.toBase64(), difficulty, gui, remoteMiner);
-        } else {
-            throw new Exception("Transaction not valid");
-        }
     }
 
     /**

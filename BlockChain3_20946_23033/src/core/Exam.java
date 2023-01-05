@@ -4,6 +4,7 @@
  */
 package core;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import utils.Serializer;
+import myUtils.Serializer;
 
 
 /**
@@ -55,9 +56,10 @@ public class Exam implements Serializable {
      * convert this object to base64
      *
      * @return
+     * @throws java.io.IOException
      */
-    public String toBase64() {
-        byte[] data = Serializer.objectToBytes(this);
+    public String toBase64() throws IOException {
+        byte[] data = Serializer.objectToByteArray(this);
         return Base64.getEncoder().encodeToString(data);
     }
 
@@ -66,11 +68,13 @@ public class Exam implements Serializable {
      *
      * @param b64
      * @return
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public static Exam fromBase64(String b64) {
+    public static Exam fromBase64(String b64) throws IOException, ClassNotFoundException {
 
         byte[] data = Base64.getDecoder().decode(b64);
-        return (Exam) Serializer.bytesToObject(data);
+        return (Exam) Serializer.byteArrayToObject(data);
     }
 
     /**

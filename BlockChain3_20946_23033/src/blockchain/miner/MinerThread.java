@@ -26,6 +26,7 @@ import java.util.Base64;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static blockchain.miner.Miner.hashAlgorithm;
 
 /**
  * Created on 02/11/2021, 18:28:06
@@ -59,7 +60,7 @@ public class MinerThread extends Thread {
         this.zeros = zeros;
         this.listener = listener;
         //criar um objeto para a thread calcular hashs
-        this.hasher = MessageDigest.getInstance(Miner.hashAlgorithm);
+        this.hasher = MessageDigest.getInstance(hashAlgorithm);
     }
 
     @Override

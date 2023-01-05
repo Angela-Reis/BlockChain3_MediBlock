@@ -16,7 +16,7 @@
 package gui.p2p;
 
 
-import blockchain.Block;
+import blockchain.chain.Block;
 import blockchain.miner.Miner;
 import java.awt.Color;
 import java.rmi.RemoteException;

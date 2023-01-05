@@ -5,7 +5,7 @@
  */
 package gui;
 
-import blockchain.Block;
+import blockchain.chain.Block;
 import p2p.miner.InterfaceRemoteMiner;
 import core.Analysis;
 import core.Exam;
@@ -14,8 +14,6 @@ import core.MediBlock;
 import core.Patient;
 import core.Transaction;
 import core.User;
-import gui.parallel.MineInterface;
-import gui.parallel.MinerWorker;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -48,15 +46,13 @@ import myUtils.GuiUtils;
  *
  * @author AR
  */
-public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
+public class MediBlockGUI extends javax.swing.JFrame {
 
     public static String fileExamHistory = "ExamHistory.obj";
     public static int DIFICULTY = 3; // mining dificulty
     InterfaceRemoteMiner miner;
     //list of analyses currently inputed to the Exam being created
     ArrayList<Analysis> analyses;
-    //Miner worker thread to mine the nounce without locking the interface
-    MinerWorker minerWorker;
 
     //Transaction being recorded to the blockchain 
     Transaction transaction;
@@ -86,6 +82,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                         //codigo run da thread
                         while (true) {
                             try {
+                                if(user.getMiner().isMining()==false){
+                                    //if miner is not mining hide the progressBar
+                                    panelMining.setVisible(false);
+                                }
                                 if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
                                     history.setBlockChain(miner.getBlockChain());
                                     history.save(fileExamHistory);
@@ -769,14 +769,6 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     }//GEN-LAST:event_btnAddAnalysisActionPerformed
 
     private void btnSaveExamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveExamActionPerformed
-        //If a previous Exam is already being added to the BlockChain stop Professionals
-        //from adding new ones
-        if (panelMining.isVisible()) {
-            JOptionPane.showMessageDialog(this,
-                    "Can´t add new Exam while uploading another One",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
         //Check if the exam has at least one analusis
         if (analyses.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -799,10 +791,10 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                         tabMain.setSelectedComponent(tabClient);
                         return;
                     }
+                    startProgressBar();
                     //Ask the blockchain to start the thread with the correct data, from the transaction
-                    minerWorker = history.mineBlock(transaction, DIFICULTY, this, miner);
-                    minerWorker.execute();
-
+                    user.getMiner().startMining(transaction.toBase64(), DIFICULTY);
+                    history.save(fileExamHistory);
                 } catch (Exception ex) {
                     Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -834,7 +826,7 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
-                minerWorker.cancel(true);
+                endProgressBar();
                 //stops mining in all the remote servers
                 miner.stopMining(9999);
             } catch (RemoteException ex) {
@@ -950,8 +942,8 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
             }
             revalidate();
         } catch (Exception ex) {
-            System.out.println("HI3");
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(MediBlock.class.getName()).log(Level.ALL, null, ex);
+           // JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -975,33 +967,8 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
 
     }
 
-    //Function overwritten from MineInterface for the MineWorker
-    @Override
-    public void onStart() {
-        startProgressBar();
-    }
-
-    @Override
-    public void onUpdate(int numNounces) {
-        //update the progress bar
-    }
-
-    @Override
-    public void onFinish(int nFinal) {
-        endProgressBar();
-        if (minerWorker.isCancelled()) {
-            return;
-        }
-        try {
-            history.save(fileExamHistory);
-            JOptionPane.showMessageDialog(this, "Exam was added to blockChain Nonce = " + nFinal);
-        } catch (Exception ex) {
-            Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     /**
-     * Show the progressBar with the number of nonces tested
+     * Show the progressBar to show remote miner is mining
      */
     public void startProgressBar() {
         panelMining.setVisible(true);
@@ -1009,7 +976,7 @@ public class MediBlockGUI extends javax.swing.JFrame implements MineInterface {
     }
 
     /**
-     * Hide the progressBar and reset it
+     * Hide the progressBar to show remote miner is not mining
      */
     public void endProgressBar() {
         panelMining.setVisible(false);

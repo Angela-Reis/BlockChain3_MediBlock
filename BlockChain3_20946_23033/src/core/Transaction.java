@@ -5,13 +5,14 @@
  */
 package core;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 import myUtils.SecurityUtils;
-import utils.Serializer;
+import myUtils.Serializer;
 
 /**
  * Class that defines the Transaction that goes into the blockchain
@@ -40,7 +41,7 @@ public class Transaction implements Serializable{
         }
 
         //turn Exam into a byte[]
-        byte[] originalExam = Serializer.objectToBytes(exam);
+        byte[] originalExam = Serializer.objectToByteArray(exam);
 
         //Since the Exam is too long to encrypt with RSA Key it was encrypted with a random AES 
         Key randomAESKey = SecurityUtils.generateAESKey(User.SIZE_AES_KEY);
@@ -66,7 +67,7 @@ public class Transaction implements Serializable{
         //turn it back into a key
         Key AESKey = SecurityUtils.getAESKey(arrKey);
         //decrypt the exam with the AES Key
-        Exam examDecrypted = (Exam) Serializer.bytesToObject(SecurityUtils.decrypt(encryptedExam, AESKey));
+        Exam examDecrypted = (Exam) Serializer.byteArrayToObject(SecurityUtils.decrypt(encryptedExam, AESKey));
         return examDecrypted;
     }
 
@@ -105,8 +106,8 @@ public class Transaction implements Serializable{
      *
      * @return
      */
-    public String toBase64() {
-        byte[] data = Serializer.objectToBytes(this);
+    public String toBase64() throws IOException {
+        byte[] data = Serializer.objectToByteArray(this);
         return Base64.getEncoder().encodeToString(data);
     }
 
@@ -116,10 +117,10 @@ public class Transaction implements Serializable{
      * @param b64
      * @return
      */
-    public static Transaction fromBase64(String b64) {
+    public static Transaction fromBase64(String b64) throws IOException, ClassNotFoundException {
 
         byte[] data = Base64.getDecoder().decode(b64);
-        return (Transaction) Serializer.bytesToObject(data);
+        return (Transaction) Serializer.byteArrayToObject(data);
     }
 
 }

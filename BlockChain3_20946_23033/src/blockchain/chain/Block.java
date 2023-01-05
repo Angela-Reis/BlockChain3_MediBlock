@@ -13,7 +13,7 @@
 //::                                                               (c)2022   ::
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //////////////////////////////////////////////////////////////////////////////
-package blockchain;
+package blockchain.chain;
 
 
 import blockchain.miner.Miner;
@@ -68,7 +68,11 @@ public class Block implements Serializable {
          return mk.getElements();
      }
 
-
+    public static Block createGenesys() throws Exception {
+        Block b = new Block(
+                String.format("%08d", 0), "Genesys", 2);
+       return new Miner(null).mine(b);
+    }
 
     public void setNonce(int newNonce) throws Exception {
         String hash = calculateHash(newNonce);

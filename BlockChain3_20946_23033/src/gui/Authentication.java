@@ -23,8 +23,6 @@ import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 import myUtils.RMI;
 
-
-
 /**
  * Class to create Jframe to authenticate into the platform
  *
@@ -44,8 +42,6 @@ public class Authentication extends javax.swing.JFrame {
         } catch (UnknownHostException ex) {
             Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
     }
 
     /**
@@ -351,37 +347,35 @@ public class Authentication extends javax.swing.JFrame {
     }//GEN-LAST:event_listPatientsValueChanged
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        try {
-            final JOptionPane optionPane = new JOptionPane("Please Wait Trying to Connect to Server");
-            optionPane.setOptions(new Object[]{});
-            
-            JProgressBar bar = new JProgressBar();
-            bar.setIndeterminate(true);
-            optionPane.add(bar);
-            
-            JDialog dialog = optionPane.createDialog(this, "Connecting");
-            dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-            
-            //Login to user
 
-            
-           // new Thread(() -> {
-                try {
-                    User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
-                    InterfaceRemoteMiner remoteMiner = (InterfaceRemoteMiner) RMI.getRemote(txtAddress.getText());
-                    user.setMiner(remoteMiner);
-                    
-                    this.dispose();
-                    new MediBlockGUI(user).setVisible(true);
-                } catch (Exception ex) {
-                    Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            
-           /* }).start();
-            dialog.setVisible(true);*/
-        } catch (Exception ex) {
-            Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        final JOptionPane optionPane = new JOptionPane("Please Wait Trying to Connect to Server");
+        optionPane.setOptions(new Object[]{});
+
+        JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        optionPane.add(bar);
+
+        JDialog dialog = optionPane.createDialog(this, "Connecting");
+        dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        new Thread(() -> {
+            try {
+                //Login to user
+                User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
+                
+                InterfaceRemoteMiner remoteMiner = (InterfaceRemoteMiner) RMI.getRemote(txtAddress.getText());
+                user.setMiner(remoteMiner);
+
+                this.dispose();
+                new MediBlockGUI(user).setVisible(true);
+            } catch (Exception ex) {
+                //Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }).start();
+        dialog.setVisible(true);
 
     }//GEN-LAST:event_btnLoginActionPerformed
 
@@ -438,7 +432,7 @@ public class Authentication extends javax.swing.JFrame {
             //Register new Health Professional to the user and it's keys to file
             User.register(prof, prof.getNumProfLicense(), new String(txtRegProfPass.getPassword()));
         } catch (Exception ex) {
-            Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
     }//GEN-LAST:event_btnRegisterProfesionalActionPerformed
 
