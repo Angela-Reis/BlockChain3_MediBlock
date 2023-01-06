@@ -91,6 +91,11 @@ public class MediBlockGUI extends javax.swing.JFrame {
                             if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
                                 history.setBlockChain(miner.getBlockChain());
                                 tabMainStateChanged(null);
+                                if (user instanceof Patient ) {
+                                    listUserExams((Patient) user);
+                                }else if(patient != null){
+                                    listUserExams(patient);
+                                }
                             }
                             Thread.sleep(1000);
                         } catch (Exception ex) {
@@ -698,6 +703,9 @@ public class MediBlockGUI extends javax.swing.JFrame {
             //If there is no Patient Selected ask HealthProfessional to select a patient
             JOptionPane.showMessageDialog(this, "Select a Patient", "Error", JOptionPane.ERROR_MESSAGE);
             tabMain.setSelectedComponent(tabListPatients);
+            if (user instanceof Patient) {
+                listUserExams((Patient) user);
+            }
         } else if (actual == tabBlock) {
             //If the selected tab is the blockchain tab, load it with the blockChain data
             DefaultListModel model = new DefaultListModel();
@@ -929,6 +937,7 @@ public class MediBlockGUI extends javax.swing.JFrame {
                 }
             }
             revalidate();
+            repaint();
         } catch (Exception ex) {
             Logger.getLogger(MediBlock.class.getName()).log(Level.ALL, null, ex);
             // JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
