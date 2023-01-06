@@ -336,6 +336,9 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
     private void btAddServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAddServerActionPerformed
         try {
             miner.addNode((InterfaceRemoteMiner) RMI.getRemote(txtServerAdress.getText()));
+            DefaultListModel model = new DefaultListModel();
+            model.addAll(miner.getBlockChain().getChain());
+            lstBlockchain.setModel(model);
         } catch (Exception ex) {
             onException("Add Server", ex);
         }
