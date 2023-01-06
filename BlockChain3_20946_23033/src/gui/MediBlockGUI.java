@@ -76,41 +76,30 @@ public class MediBlockGUI extends javax.swing.JFrame {
         try {
             //If there is a blockChain saved load it
             history.setBlockChain(user.getMiner().getBlockChain());
-
-            new Thread(
-                    () -> {
-                        //codigo run da thread
-                        while (true) {
-                            try {
-                                if(user.getMiner().isMining()==false){
-                                    //if miner is not mining hide the progressBar
-                                    panelMining.setVisible(false);
-                                }
-                                if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
-                                    history.setBlockChain(miner.getBlockChain());
-                                    history.save(fileExamHistory);
-                                    SwingUtilities.invokeLater(
-                                            () -> {
-                                                try {
-                                                    tabMainStateChanged(null);
-                                                    history.save(fileExamHistory);
-                                                } catch (IOException ex) {
-                                                    Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
-                                            }
-                                    );
-
-                                }
-                                Thread.sleep(1000);
-                            } catch (Exception ex) {
-                            }
-
-                        }
-                    }
-            ).start();
-            history = MediBlock.load(fileExamHistory);
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (RemoteException ex) {
         }
+
+        new Thread(
+                () -> {
+                    //codigo run da thread
+                    while (true) {
+                        try {
+                            if (miner.isMining() == false) {
+                                //if miner is not mining hide the progressBar
+                                panelMining.setVisible(false);
+                            }
+                            if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
+                                history.setBlockChain(miner.getBlockChain());
+                                tabMainStateChanged(null);
+                            }
+                            Thread.sleep(1000);
+                        } catch (Exception ex) {
+                        }
+
+                    }
+                }
+        ).start();
+
         initComponents();
 
         //Insert Connection in Client Log and change the address textBox to the address of current miner
@@ -794,7 +783,6 @@ public class MediBlockGUI extends javax.swing.JFrame {
                     startProgressBar();
                     //Ask the blockchain to start the thread with the correct data, from the transaction
                     user.getMiner().startMining(transaction.toBase64(), DIFICULTY);
-                    history.save(fileExamHistory);
                 } catch (Exception ex) {
                     Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -943,7 +931,7 @@ public class MediBlockGUI extends javax.swing.JFrame {
             revalidate();
         } catch (Exception ex) {
             Logger.getLogger(MediBlock.class.getName()).log(Level.ALL, null, ex);
-           // JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            // JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

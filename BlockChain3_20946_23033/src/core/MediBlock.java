@@ -117,33 +117,6 @@ public class MediBlock implements Serializable {
         history.add(t.toBase64(), difficulty);
     }
 
-    /**
-     * Method to save the blockchain as an object
-     *
-     * @param fileName
-     * @throws IOException
-     */
-    public void save(String fileName) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(
-                new FileOutputStream(fileName))) {
-            out.writeObject(this);
-        }
-    }
-
-    /**
-     * Load the object representing the blockchain from memory
-     *
-     * @param fileName
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public static MediBlock load(String fileName) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(
-                new FileInputStream(fileName))) {
-            return (MediBlock) in.readObject();
-        }
-    }
 
     public void setBlockChain(BlockChain blockChain) {
         history = blockChain;
