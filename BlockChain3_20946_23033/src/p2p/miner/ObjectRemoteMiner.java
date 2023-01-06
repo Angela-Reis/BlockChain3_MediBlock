@@ -150,6 +150,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                 remote.getAdress();
                 if(remote.getChainSize()>this.getChainSize()){
                     this.chain = remote.getBlockChain();
+                    chain.save(BLOCHCHAIN_FILE);
                 }
             } catch (Exception ex) {
                 //something is wrong
