@@ -19,7 +19,11 @@ package gui.p2p;
 import blockchain.chain.Block;
 import blockchain.miner.Miner;
 import java.awt.Color;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import myUtils.GuiUtils;
 import myUtils.RMI;
@@ -41,6 +45,10 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
      */
     public Remote_MinerBlockChain() {
         initComponents();
+        try {
+            txtServerAdress.setText("//" + InetAddress.getLocalHost().getHostAddress() + ":" + 10010 + "/" + InterfaceRemoteMiner.NAME);
+        } catch (UnknownHostException ex) {
+        }
         setLocationRelativeTo(null);
     }
 

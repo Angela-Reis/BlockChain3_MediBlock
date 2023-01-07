@@ -40,7 +40,6 @@ public class Authentication extends javax.swing.JFrame {
             //set default address as localhost address
             txtAddress.setText("//" + InetAddress.getLocalHost().getHostAddress() + ":" + 10010 + "/" + InterfaceRemoteMiner.NAME);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

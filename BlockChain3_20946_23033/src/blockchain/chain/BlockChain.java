@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created on 22/08/2022, 10:09:17
@@ -32,15 +33,15 @@ import java.util.ArrayList;
  */
 public class BlockChain implements Serializable {
 
-    ArrayList<Block> chain = new ArrayList<>();
+    CopyOnWriteArrayList<Block> chain = new CopyOnWriteArrayList<>();
 
-    public ArrayList<Block> getChain() {
+    public CopyOnWriteArrayList<Block> getChain() {
         return chain;
     }
 
     public BlockChain() {
         try {
-            chain = new ArrayList<>();
+            chain = new CopyOnWriteArrayList<>();
             add(Block.createGenesys());
         } catch (Exception ex) {
         }
@@ -116,7 +117,7 @@ public class BlockChain implements Serializable {
 
     public void load(String fileName) throws Exception {
         try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
-            this.chain = (ArrayList<Block>) in.readObject();
+            this.chain = (CopyOnWriteArrayList<Block>) in.readObject();
         }
     }
 
