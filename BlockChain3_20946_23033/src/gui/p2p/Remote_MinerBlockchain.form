@@ -203,7 +203,7 @@
                         <Component class="javax.swing.JButton" name="btAddServer">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/blockChain/gui/images/add-server-icon.png"/>
+                              <Image iconType="3" name="/gui/p2p/images/add-server-icon.png"/>
                             </Property>
                             <Property name="text" type="java.lang.String" value="Add  Node"/>
                           </Properties>
@@ -260,7 +260,7 @@
                     <Component class="javax.swing.JButton" name="btStartServer">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                          <Image iconType="3" name="/blockChain/gui/images/start.png"/>
+                          <Image iconType="3" name="/gui/p2p/images/start.png"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Start Server"/>
                       </Properties>
@@ -414,7 +414,7 @@
                         <Component class="javax.swing.JLabel" name="icon">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/blockChain/gui/images/working.gif"/>
+                              <Image iconType="3" name="/gui/p2p/images/working.gif"/>
                             </Property>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
@@ -475,7 +475,7 @@
                       <JTabbedPaneConstraints tabName="Ledger">
                         <Property name="tabTitle" type="java.lang.String" value="Ledger"/>
                         <Property name="tabIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                          <Image iconType="3" name="/templarCoin/multimedia/blockChain.png"/>
+                          <Image iconType="3" name="/gui/p2p/images/blockChain.png"/>
                         </Property>
                       </JTabbedPaneConstraints>
                     </Constraint>
@@ -500,7 +500,7 @@
                       <JTabbedPaneConstraints tabName="BlockChainExplorer">
                         <Property name="tabTitle" type="java.lang.String" value="BlockChainExplorer"/>
                         <Property name="tabIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                          <Image iconType="3" name="/templarCoin/multimedia/Block.png"/>
+                          <Image iconType="3" name="/gui/p2p/images/Block.png"/>
                         </Property>
                       </JTabbedPaneConstraints>
                     </Constraint>

@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.mediblock;
 
 import blockchain.chain.Block;
-import p2p.miner.InterfaceRemoteMiner;
+import blockchain.p2p.InterfaceRemoteMiner;
 import core.Analysis;
 import core.Exam;
 import core.HealthProfessional;

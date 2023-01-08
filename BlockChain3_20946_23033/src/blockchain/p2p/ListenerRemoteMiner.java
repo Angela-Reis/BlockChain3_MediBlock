@@ -13,7 +13,7 @@
 //::                                                               (c)2021   ::
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //////////////////////////////////////////////////////////////////////////////
-package p2p.miner;
+package blockchain.p2p;
 
 import blockchain.chain.Block;
 import blockchain.miner.MiningListener;

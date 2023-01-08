@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.mediblock;
 
-import p2p.miner.InterfaceRemoteMiner;
+import blockchain.p2p.InterfaceRemoteMiner;
 import core.HealthProfessional;
 import core.Patient;
 import core.User;
@@ -14,8 +14,6 @@ import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;

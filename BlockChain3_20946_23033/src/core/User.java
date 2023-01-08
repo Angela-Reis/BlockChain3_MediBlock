@@ -4,7 +4,7 @@
  */
 package core;
 
-import p2p.miner.InterfaceRemoteMiner;
+import blockchain.p2p.InterfaceRemoteMiner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

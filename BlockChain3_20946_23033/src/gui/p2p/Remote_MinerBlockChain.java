@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import myUtils.GuiUtils;
 import myUtils.RMI;
-import p2p.miner.ObjectRemoteMiner;
-import p2p.miner.InterfaceRemoteMiner;
-import p2p.miner.ListenerRemoteMiner;
+import blockchain.p2p.ObjectRemoteMiner;
+import blockchain.p2p.InterfaceRemoteMiner;
+import blockchain.p2p.ListenerRemoteMiner;
 import javax.swing.DefaultListModel;
 
 /**
@@ -123,7 +123,7 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
         txtServerAdress.setText("//10.10.209.111:10010/miner");
         txtServerAdress.setBorder(javax.swing.BorderFactory.createTitledBorder("Node Adress"));
 
-        btAddServer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/blockChain/gui/images/add-server-icon.png"))); // NOI18N
+        btAddServer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/p2p/images/add-server-icon.png"))); // NOI18N
         btAddServer.setText("Add  Node");
         btAddServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -175,7 +175,7 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Miner Server"));
 
-        btStartServer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/blockChain/gui/images/start.png"))); // NOI18N
+        btStartServer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/p2p/images/start.png"))); // NOI18N
         btStartServer.setText("Start Server");
         btStartServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -237,7 +237,7 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
         txtHash.setText("0");
         txtHash.setBorder(javax.swing.BorderFactory.createTitledBorder("Hash"));
 
-        icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/blockChain/gui/images/working.gif"))); // NOI18N
+        icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gui/p2p/images/working.gif"))); // NOI18N
         icon.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -292,7 +292,7 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
         txtLeger.setRows(5);
         jScrollPane4.setViewportView(txtLeger);
 
-        tpBlockchain.addTab("Ledger", new javax.swing.ImageIcon(getClass().getResource("/templarCoin/multimedia/blockChain.png")), jScrollPane4); // NOI18N
+        tpBlockchain.addTab("Ledger", new javax.swing.ImageIcon(getClass().getResource("/gui/p2p/images/blockChain.png")), jScrollPane4); // NOI18N
 
         pnBlockChain.setLayout(new java.awt.BorderLayout());
 
@@ -318,7 +318,7 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
 
         pnBlockChain.add(jScrollPane6, java.awt.BorderLayout.CENTER);
 
-        tpBlockchain.addTab("BlockChainExplorer", new javax.swing.ImageIcon(getClass().getResource("/templarCoin/multimedia/Block.png")), pnBlockChain); // NOI18N
+        tpBlockchain.addTab("BlockChainExplorer", new javax.swing.ImageIcon(getClass().getResource("/gui/p2p/images/Block.png")), pnBlockChain); // NOI18N
 
         tpMain.addTab("BlockChain", tpBlockchain);
 
