@@ -90,7 +90,7 @@ public class BlockChain implements Serializable {
         //mining block
         int nonce = new Miner(null).mine(prevHash + data + dificulty, dificulty);
         //build new block
-        Block newBlock = new Block(prevHash, data, dificulty);
+        Block newBlock = new Block(prevHash, dificulty, data);
         newBlock.setNonce(nonce);
         //add new block to the chain
         chain.add(newBlock);

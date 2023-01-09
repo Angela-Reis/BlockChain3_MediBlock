@@ -7,18 +7,12 @@ package core;
 
 import blockchain.chain.Block;
 import blockchain.chain.BlockChain;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class to create the medical history over a blockchain
@@ -61,6 +55,7 @@ public class MediBlock implements Serializable {
      * patientPubKeyStr decript the Exams and sends list with them
      *
      * @param patient
+     * @param pk
      * @return
      * @throws java.lang.Exception
      */
@@ -72,14 +67,19 @@ public class MediBlock implements Serializable {
         List<Exam> hstPatient = new ArrayList<>();
         for (Block b : history.getChain()) {
             //get Transaction
-            Transaction transaction;
-            try {
-                transaction = Transaction.fromBase64(b.getData());
-                if (transaction.getPatient().equals(patientPubKeyStr)) {
-                    hstPatient.add(transaction.getDecodedExam(pk));
+            List<String> transactions = b.getTransactions();
+            for (String t : transactions) {
+
+                Transaction transaction;
+                try {
+                    transaction = Transaction.fromBase64(t);
+                    if (transaction.getPatient().equals(patientPubKeyStr)) {
+                        hstPatient.add(transaction.getDecodedExam(pk));
+                    }
+                } catch (IOException | ClassNotFoundException ex) {
                 }
-            } catch (IOException | ClassNotFoundException ex) {
             }
+
         }
         return hstPatient;
     }

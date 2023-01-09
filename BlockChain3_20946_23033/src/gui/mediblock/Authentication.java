@@ -18,6 +18,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import myUtils.RMI;
 
@@ -359,12 +360,13 @@ public class Authentication extends javax.swing.JFrame {
             try {
                 //Login to user
                 User user = User.load(txtUser.getText(), new String(txtPassLogin.getPassword()));
-                
+
                 InterfaceRemoteMiner remoteMiner = (InterfaceRemoteMiner) RMI.getRemote(txtAddress.getText());
                 user.setMiner(remoteMiner);
-
-                this.dispose();
-                new MediBlockGUI(user).setVisible(true);
+                SwingUtilities.invokeLater(() -> {
+                    this.dispose();
+                    new MediBlockGUI(user).setVisible(true);
+                });
             } catch (Exception ex) {
                 //Logger.getLogger(Authentication.class.getName()).log(Level.SEVERE, null, ex);
                 dialog.dispose();

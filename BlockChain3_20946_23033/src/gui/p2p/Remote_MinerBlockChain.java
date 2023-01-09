@@ -15,22 +15,22 @@
 //////////////////////////////////////////////////////////////////////////////
 package gui.p2p;
 
-
 import blockchain.chain.Block;
 import blockchain.miner.Miner;
+import blockchain.p2p.InterfaceRemoteMiner;
+import blockchain.p2p.ListenerRemoteMiner;
+import blockchain.p2p.ObjectRemoteMiner;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 import myUtils.GuiUtils;
 import myUtils.RMI;
-import blockchain.p2p.ObjectRemoteMiner;
-import blockchain.p2p.InterfaceRemoteMiner;
-import blockchain.p2p.ListenerRemoteMiner;
-import javax.swing.DefaultListModel;
 
 /**
  *
@@ -39,6 +39,7 @@ import javax.swing.DefaultListModel;
 public class Remote_MinerBlockChain extends javax.swing.JFrame implements ListenerRemoteMiner {
 
     ObjectRemoteMiner miner = null;
+    public static int DIFICULTY = 3; // mining dificulty
 
     /**
      * Creates new form Test03_GUI_miner
@@ -353,12 +354,17 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
     }//GEN-LAST:event_btAddServerActionPerformed
 
     private void lstBlockchainValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstBlockchainValueChanged
-       if( lstBlockchain.getSelectedIndex() >=0){
-           Block selected = (Block)lstBlockchain.getSelectedValues()[0];
-           txtBlock.setText(selected.getFullInfo());
-       }else{
-           txtBlock.setText("");
-       }
+        if (lstBlockchain.getSelectedIndex() >= 0) {
+            Block selected = (Block) lstBlockchain.getSelectedValuesList().toArray()[0];
+            String numT = "";
+            try {
+                numT = "\nNumber of Transactions:\n\t" + selected.getTransactions().size();
+            } catch (Exception ex) {
+            }
+            txtBlock.setText(selected.getFullInfo() + numT);
+        } else {
+            txtBlock.setText("");
+        }
     }//GEN-LAST:event_lstBlockchainValueChanged
 
     /**
@@ -733,6 +739,17 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
         try {
             miner.stopMining(nonce);
             miner.addNewNode(nonce);
+            /*
+            List<String> transactions = miner.getUnprocessedTransactions();
+            //if there is new transactions to mine, start mining again
+            if (!transactions.isEmpty()) {
+                try {
+                    miner.startMining(transactions, DIFICULTY);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Remote_MinerBlockChain.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+             */
         } catch (RemoteException ex) {
             onException("Nounce Found", ex);
         }

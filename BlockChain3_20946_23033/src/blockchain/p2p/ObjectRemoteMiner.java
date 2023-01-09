@@ -15,8 +15,6 @@
 //////////////////////////////////////////////////////////////////////////////
 package blockchain.p2p;
 
-
-
 import blockchain.chain.Block;
 import blockchain.chain.BlockChain;
 import blockchain.miner.Miner;
@@ -24,6 +22,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -44,6 +43,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
 
     private BlockChain chain; // blockchain
     private Block incompleteBlock; //
+    private List<String> unprocessedTransactions;
 
     /**
      * constructor
@@ -65,7 +65,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
             address = "//" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + InterfaceRemoteMiner.NAME;
             // blochain
             chain = new BlockChain();
-            
+
             try {
                 chain.load(BLOCHCHAIN_FILE);
             } catch (Exception e) {
@@ -250,26 +250,41 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
     @Override
     public void startMining(String message, int zeros) throws RemoteException {
         try {
-            //se já estiver a minar - Não faz nada
+            //If it's mining add the message to the unprocessed transactions
+            if (miner.isMining()) {
+                unprocessedTransactions.add(message);
+                return;
+            }
+            List<String> msg = new ArrayList<>();
+            msg.add(message);
+            startMining(msg, zeros);
+        } catch (Exception ex) {
+            throw new RemoteException("Start mining", ex);
+        }
+    }
+
+    @Override
+    public void startMining(List<String> messages, int zeros) throws RemoteException {
+        try {
             if (miner.isMining()) {
                 return;
             }
-
+            unprocessedTransactions = new ArrayList<>();
             //fazer um novo bloco
             incompleteBlock = new Block(chain.getLastBlockHash(),
-                    message, zeros);
+                    zeros, messages.toArray(new String[messages.size()]));
             //colocar o mineiro a minar
             miner.startMining(incompleteBlock.getHeader(), zeros);
 
             //Por todos os mineiros da rede a minar
             for (InterfaceRemoteMiner remote : network) {
-                remote.startMining(message, zeros);
+                remote.startMining(messages, zeros);
             }
             //:::::::::: Notificar o listener ::::::::::::::
-            listener.onStartMining(message, zeros);
+            listener.onStartMining(incompleteBlock.getData(), zeros);
 
         } catch (Exception ex) {
-            throw new RemoteException("Start mining", ex);
+            throw new RemoteException("Start mining Merkle", ex);
         }
     }
 
@@ -305,6 +320,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                 listener.onStopMining(remote.getNonce());
                 listener.onMessage("Stop Remote Mining", remote.getAdress());
             }
+            
         }
 
     }
@@ -326,13 +342,12 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                 }
                 //guardar a chain
                 chain.save(BLOCHCHAIN_FILE);
-                
+
                 //espalhar o bloco pela rede
                 for (InterfaceRemoteMiner node : network) {
                     node.addBlock(b);
                 }
-                
-                
+
             }
 
         } catch (Exception ex) {
@@ -370,8 +385,12 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
     public BlockChain getBlockChain() throws RemoteException {
         return chain;
     }
-    
-    public void addNewNode(int nonce){
+
+    public List<String> getUnprocessedTransactions() {
+        return unprocessedTransactions;
+    }
+
+    public void addNewNode(int nonce) {
         try {
             incompleteBlock.setNonce(nonce);
             addBlock(incompleteBlock);

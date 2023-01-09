@@ -44,12 +44,6 @@ public class Block implements Serializable {
     int nonce;           // proof of work 
     String currentHash;  // Hash of block
 
-    public Block(String previousHash, String data, int zeros) throws Exception {
-        this.previousHash = previousHash;
-        this.merkleRoot = data;
-        this.zeros = zeros;
-    }
-    
      public Block(String previousHash, int zeros, String ...elements) throws Exception {
         this.previousHash = previousHash;
         this.zeros = zeros;
@@ -70,7 +64,7 @@ public class Block implements Serializable {
 
     public static Block createGenesys() throws Exception {
         Block b = new Block(
-                String.format("%08d", 0), "Genesys", 2);
+                String.format("%08d", 0), 2,"Genesys");
        return new Miner(null).mine(b);
     }
 

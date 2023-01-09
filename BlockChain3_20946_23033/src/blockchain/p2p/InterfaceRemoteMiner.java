@@ -71,6 +71,15 @@ public interface InterfaceRemoteMiner extends Remote {
      * @throws RemoteException
      */
     public void startMining(String message, int zeros) throws RemoteException;
+    
+    /**
+     * Start mining the messages
+     *
+     * @param messages messages
+     * @param zeros number of zeros
+     * @throws RemoteException
+     */
+    public void startMining(List<String> messages, int zeros) throws RemoteException;
 
     /**
      * Stop mining the message

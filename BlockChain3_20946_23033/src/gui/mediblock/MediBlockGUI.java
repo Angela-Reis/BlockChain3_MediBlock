@@ -20,7 +20,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,7 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import myUtils.GuiUtils;
 
 /**
@@ -91,9 +89,9 @@ public class MediBlockGUI extends javax.swing.JFrame {
                             if (miner.getChainSize() > history.getBlockChain().getChain().size()) {
                                 history.setBlockChain(miner.getBlockChain());
                                 tabMainStateChanged(null);
-                                if (user instanceof Patient ) {
+                                if (user instanceof Patient) {
                                     listUserExams((Patient) user);
-                                }else if(patient != null){
+                                } else if (patient != null) {
                                     listUserExams(patient);
                                 }
                             }
@@ -784,7 +782,9 @@ public class MediBlockGUI extends javax.swing.JFrame {
                 try {
                     //Check if connect to remote minerWorker
                     if (miner == null) {
-                        JOptionPane.showMessageDialog(this, "Connect to a Server Before adding Block", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this,
+                                "Connect to a Server Before adding Block",
+                                "Error", JOptionPane.ERROR_MESSAGE);
                         tabMain.setSelectedComponent(tabClient);
                         return;
                     }
@@ -796,7 +796,7 @@ public class MediBlockGUI extends javax.swing.JFrame {
                 }
                 cleanNewExamTab();
             } catch (Exception ex) {
-                Logger.getLogger(MediBlockGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Only Health Professionals can add Exams", "Error", JOptionPane.ERROR_MESSAGE);
@@ -810,7 +810,14 @@ public class MediBlockGUI extends javax.swing.JFrame {
     private void lstBlockchainValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstBlockchainValueChanged
         if (lstBlockchain.getSelectedIndex() >= 0) {
             Block b = (Block) lstBlockchain.getSelectedValuesList().toArray()[0];
-            txtBlock.setText(b.getFullInfo());
+            String numT = "";
+            try {
+                numT = "\nNumber of Transactions:\n\t" + b.getTransactions().size();
+            } catch (Exception ex) {
+            }
+            txtBlock.setText(b.getFullInfo() + numT);
+        } else {
+            txtBlock.setText("");
         }
     }//GEN-LAST:event_lstBlockchainValueChanged
 
