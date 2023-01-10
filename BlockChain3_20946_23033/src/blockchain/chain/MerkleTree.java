@@ -13,7 +13,7 @@
 //::                                                               (c)2022   ::
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //////////////////////////////////////////////////////////////////////////////
-package myUtils;
+package blockchain.chain;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
