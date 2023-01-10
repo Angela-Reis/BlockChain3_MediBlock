@@ -778,7 +778,9 @@ public class MediBlockGUI extends javax.swing.JFrame {
                 //Create new Exam
                 Exam exam = new Exam(LocalDateTime.now(), (Patient) cbPatients.getSelectedObjects()[0], prof, analyses);
                 //Make a new Transaction to add to the blockChain
-                transaction = new Transaction(exam, (HealthProfessional) user);
+                transaction = new Transaction(exam, prof);
+                //Health Professional signs the Transaction 
+                transaction.sign(user.getPrivKey());
                 try {
                     //Check if connect to remote minerWorker
                     if (miner == null) {

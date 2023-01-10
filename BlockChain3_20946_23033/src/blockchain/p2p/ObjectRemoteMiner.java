@@ -18,6 +18,8 @@ package blockchain.p2p;
 import blockchain.chain.Block;
 import blockchain.chain.BlockChain;
 import blockchain.miner.Miner;
+import gui.p2p.Remote_MinerBlockChain;
+import static gui.p2p.Remote_MinerBlockChain.DIFICULTY;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
@@ -148,7 +150,6 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
         for (InterfaceRemoteMiner remote : network) {
             try {
                 remote.getAdress();
-                SynChain(remote);
             } catch (Exception ex) {
                 //something is wrong
                 network.remove(remote);
@@ -157,7 +158,14 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                 }
             }
         }
-
+        
+        SynChain(ir);
+        if (this.getChainSize()==1 && this.chain.get(0).getNonce() != ir.getBlockChain().get(0).getNonce()) {
+            this.chain = ir.getBlockChain();
+            if (listener != null) {
+                listener.onSynchronizeChain("Syncronize with", ir.getAdress());
+            }
+        }
         //se a rede não tiver o no
         if (!network.contains(ir)) {
             //adicionar o mineiro
@@ -165,7 +173,6 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
             //espalhar o mineiro pela rede
             //para cada no remoto
             for (InterfaceRemoteMiner remote : network) {
-
                 //adicionar o novo no ao remoto
                 remote.addNode(ir); // pedir para adiconar o novo nó
                 //adicionar o this ao remoto
@@ -252,7 +259,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
         try {
             //If it's mining add the message to the unprocessed transactions
             if (miner.isMining()) {
-                unprocessedTransactions.add(message);
+                addUnprocessedTransaction(message);
                 return;
             }
             List<String> msg = new ArrayList<>();
@@ -320,11 +327,29 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                 listener.onStopMining(remote.getNonce());
                 listener.onMessage("Stop Remote Mining", remote.getAdress());
             }
-            
+
         }
 
     }
 
+    @Override
+    public void addUnprocessedTransaction(String t) throws RemoteException {
+        if (!unprocessedTransactions.contains(t)) {
+                //verificasr se o bloco encaixa
+                // senão sincronizar a chain
+                unprocessedTransactions.add(t);
+                if (listener != null) {
+                    listener.onMessage("Add New Transaction ", t);
+                }
+
+                //espalhar o bloco pela rede
+                for (InterfaceRemoteMiner node : network) {
+                    node.addUnprocessedTransaction(t);
+                }
+            }
+    }
+
+    
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //:::::                                                         :::::::::::::
     //:::::                BLOCKCHAIN 
@@ -366,7 +391,7 @@ public class ObjectRemoteMiner extends UnicastRemoteObject implements InterfaceR
                     remote.SynChain(node);
                 }
                 if (listener != null) {
-                    listener.onSynchronizeChain("Sincronoze with", node.getAdress());
+                    listener.onSynchronizeChain("Syncronize with", node.getAdress());
                 }
                 //guardar a chain
                 chain.save(BLOCHCHAIN_FILE);

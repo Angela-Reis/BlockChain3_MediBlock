@@ -128,6 +128,13 @@ public interface InterfaceRemoteMiner extends Remote {
      * @throws java.rmi.RemoteException
      */
     public String getHash() throws RemoteException;
+    
+    /**
+     * add an transaction that can't be mined due to the network already mining
+     * @param t
+     * @throws RemoteException 
+     */
+    public void addUnprocessedTransaction(String t) throws RemoteException;
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //:::::                                                         :::::::::::::
     //:::::                BLOCKCHAIN 

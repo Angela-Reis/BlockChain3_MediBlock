@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 import myUtils.SecurityUtils;
 import myUtils.Serializer;
@@ -50,9 +51,6 @@ public class Transaction implements Serializable{
         //This AES Key is then encrypted with the RSA Algorithm and saved to later decrypt the exam
         this.encryptedAES = SecurityUtils.encrypt(randomAESKey.getEncoded(), exam.getPatient().getPubKey());
 
-        //Health Professional signs the Transaction 
-        sign(prof.getPrivKey());
-
     }
 
     /**
@@ -72,14 +70,14 @@ public class Transaction implements Serializable{
     }
 
     public final void sign(PrivateKey priv) throws Exception {
-        byte[] data = (professional + patient + encryptedExam).getBytes();
+        byte[] data = (professional + patient + Arrays.toString(encryptedExam)).getBytes();
         byte[] s = SecurityUtils.sign(data, priv);
         signature = Base64.getEncoder().encodeToString(s);
     }
 
     public boolean validateSignature() throws Exception {
         //Transaction Data
-        byte[] data = (professional + patient + encryptedExam).getBytes();
+        byte[] data = (professional + patient + Arrays.toString(encryptedExam)).getBytes();
         //Sign data
         byte[] sign = Base64.getDecoder().decode(signature);
         //Public Key of professional

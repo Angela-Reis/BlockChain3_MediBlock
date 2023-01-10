@@ -739,17 +739,13 @@ public class Remote_MinerBlockChain extends javax.swing.JFrame implements Listen
         try {
             miner.stopMining(nonce);
             miner.addNewNode(nonce);
-            /*
+
+            //List of transactions made while miner was mining
             List<String> transactions = miner.getUnprocessedTransactions();
             //if there is new transactions to mine, start mining again
             if (!transactions.isEmpty()) {
-                try {
-                    miner.startMining(transactions, DIFICULTY);
-                } catch (RemoteException ex) {
-                    Logger.getLogger(Remote_MinerBlockChain.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                miner.startMining(transactions, DIFICULTY);
             }
-             */
         } catch (RemoteException ex) {
             onException("Nounce Found", ex);
         }
